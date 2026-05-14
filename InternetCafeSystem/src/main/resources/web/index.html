@@ -700,6 +700,7 @@ table tbody tr:hover {
             <tr>
               <th>ID</th>
               <th>用户名</th>
+              <th>姓名</th>
               <th>手机号</th>
               <th>余额</th>
               <th>会员等级</th>
@@ -831,8 +832,8 @@ table tbody tr:hover {
               <th>用户名</th>
               <th>消费金额</th>
               <th>消费类型</th>
-              <th>余额</th>
-              <th>时间</th>
+              <th>时长</th>
+              <th>下机时间</th>
             </tr>
           </thead>
           <tbody id="consume-records-table"></tbody>
@@ -934,7 +935,6 @@ table tbody tr:hover {
               <th>操作人</th>
               <th>操作类型</th>
               <th>描述</th>
-              <th>IP地址</th>
               <th>时间</th>
             </tr>
           </thead>
@@ -958,6 +958,14 @@ table tbody tr:hover {
     <div class="form-group">
       <label>密码</label>
       <input type="password" id="um-password" placeholder="请输入密码">
+    </div>
+    <div class="form-group">
+      <label>真实姓名</label>
+      <input type="text" id="um-realname" placeholder="请输入真实姓名">
+    </div>
+    <div class="form-group">
+      <label>身份证号</label>
+      <input type="text" id="um-idcard" placeholder="请输入身份证号">
     </div>
     <div class="form-group">
       <label>手机号</label>
@@ -1135,10 +1143,10 @@ async function loadDashboard() {
     var ranking = await apiFetch('/api/report/ranking');
     if (summary.data || summary) {
       var s = summary.data || summary;
-      document.getElementById('stat-today-income').textContent = '¥' + (s.todayIncome || 0).toFixed(2);
-      document.getElementById('stat-month-income').textContent = '¥' + (s.monthIncome || 0).toFixed(2);
+      document.getElementById('stat-today-income').textContent = '¥' + (s.todayRevenue || 0).toFixed(2);
+      document.getElementById('stat-month-income').textContent = '¥' + (s.monthRevenue || 0).toFixed(2);
       document.getElementById('stat-today-recharge').textContent = '¥' + (s.todayRecharge || 0).toFixed(2);
-      document.getElementById('stat-today-sessions').textContent = s.todaySessions || 0;
+      document.getElementById('stat-today-sessions').textContent = s.todayOnlineCount || 0;
       document.getElementById('stat-total-users').textContent = s.totalUsers || 0;
     }
     var rankData = ranking.data || ranking || [];
@@ -1170,8 +1178,8 @@ function renderRanking(containerId, data) {
     else if (idx === 2) numClass = 'top3';
     html += '<li class="rank-item">';
     html += '<span class="rank-num ' + numClass + '">' + (idx + 1) + '</span>';
-    html += '<span class="rank-name">' + (item.nickName || item.username || '未知用户') + '</span>';
-    html += '<span class="rank-value">¥' + (item.totalSpent || item.amount || 0).toFixed(2) + '</span>';
+    html += '<span class="rank-name">' + (item.username || '未知用户') + '</span>';
+    html += '<span class="rank-value">¥' + (item.totalAmount || 0).toFixed(2) + '</span>';
     html += '</li>';
   });
   container.innerHTML = html;
@@ -1195,16 +1203,17 @@ async function loadUsers(page) {
 
     var tbody = document.getElementById('users-table-body');
     if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">暂无用户数据</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">暂无用户数据</td></tr>';
     } else {
       var html = '';
       rows.forEach(function(u) {
         html += '<tr>';
         html += '<td>' + (u.id || '') + '</td>';
         html += '<td>' + (u.username || '') + '</td>';
+        html += '<td>' + (u.realName || '') + '</td>';
         html += '<td>' + (u.phone || '') + '</td>';
         html += '<td>¥' + (u.balance || 0).toFixed(2) + '</td>';
-        html += '<td>' + (u.vipLevel || '普通') + '</td>';
+        html += '<td>' + (u.vipLevelName || '普通') + '</td>';
         html += '<td>' + (u.status === 1 ? '正常' : '禁用') + '</td>';
         html += '<td>' + (u.createTime || '') + '</td>';
         html += '<td>';
@@ -1237,17 +1246,19 @@ function openUserModal(userId) {
   document.getElementById('user-modal-title').textContent = userId ? '编辑用户' : '添加用户';
   document.getElementById('um-username').value = '';
   document.getElementById('um-password').value = '';
+  document.getElementById('um-realname').value = '';
+  document.getElementById('um-idcard').value = '';
   document.getElementById('um-phone').value = '';
   document.getElementById('um-balance').value = '0';
 
   if (userId) {
     showLoading();
-    apiFetch('/api/users?keyword=&userId=' + userId).then(function(data) {
-      var list = data.data || data;
-      var rows = Array.isArray(list) ? list : (list.records || list.list || []);
-      var u = rows.find(function(r) { return r.id === userId; }) || rows[0];
+    apiFetch('/api/users/' + userId).then(function(data) {
+      var u = data.data || data;
       if (u) {
         document.getElementById('um-username').value = u.username || '';
+        document.getElementById('um-realname').value = u.realName || '';
+        document.getElementById('um-idcard').value = u.idCard || '';
         document.getElementById('um-phone').value = u.phone || '';
         document.getElementById('um-balance').value = u.balance || 0;
       }
@@ -1269,6 +1280,8 @@ function closeUserModal() {
 async function saveUser() {
   var username = document.getElementById('um-username').value.trim();
   var password = document.getElementById('um-password').value.trim();
+  var realName = document.getElementById('um-realname').value.trim();
+  var idCard = document.getElementById('um-idcard').value.trim();
   var phone = document.getElementById('um-phone').value.trim();
   var balance = parseFloat(document.getElementById('um-balance').value) || 0;
 
@@ -1277,7 +1290,7 @@ async function saveUser() {
 
   showLoading();
   try {
-    var body = { username: username, phone: phone, balance: balance };
+    var body = { username: username, realName: realName, idCard: idCard, phone: phone, balance: balance };
     if (password) body.password = password;
 
     if (editingUserId) {
@@ -1333,8 +1346,8 @@ async function loadOnline() {
         html += '<td>' + (s.id || '') + '</td>';
         html += '<td>' + (s.username || '') + '</td>';
         html += '<td>' + (s.machineNo || '') + '</td>';
-        html += '<td>' + (s.startTime || '') + '</td>';
-        html += '<td class="timer" data-start="' + (s.startTime || '') + '" id="timer-' + s.id + '">计算中...</td>';
+        html += '<td>' + (s.loginTime || '') + '</td>';
+        html += '<td class="timer" data-start="' + (s.loginTime || '') + '" id="timer-' + s.id + '">计算中...</td>';
         html += '<td>¥' + (s.cost || 0).toFixed(2) + '</td>';
         html += '<td><button class="btn btn-danger btn-sm" onclick="stopOnline(' + s.id + ')">下机</button></td>';
         html += '</tr>';
@@ -1354,8 +1367,8 @@ async function loadOnline() {
         histHtml += '<td>' + (s.id || '') + '</td>';
         histHtml += '<td>' + (s.username || '') + '</td>';
         histHtml += '<td>' + (s.machineNo || '') + '</td>';
-        histHtml += '<td>' + (s.startTime || '') + '</td>';
-        histHtml += '<td>' + (s.endTime || '') + '</td>';
+        histHtml += '<td>' + (s.loginTime || '') + '</td>';
+        histHtml += '<td>' + (s.logoutTime || '') + '</td>';
         histHtml += '<td>' + (s.duration || '') + '</td>';
         histHtml += '<td>¥' + (s.cost || 0).toFixed(2) + '</td>';
         histHtml += '</tr>';
@@ -1396,9 +1409,10 @@ async function startOnline() {
 
   showLoading();
   try {
-    var data = await apiFetch('/api/charge/start', {
+    var userId = await findUserId(keyword);
+    await apiFetch('/api/charge/start', {
       method: 'POST',
-      body: JSON.stringify({ keyword: keyword, machineNo: machine })
+      body: JSON.stringify({ userId: userId, machineNo: machine })
     });
     showToast('上机成功', 'success');
     document.getElementById('online-user-search').value = '';
@@ -1425,22 +1439,30 @@ async function stopOnline(id) {
   }
 }
 
+async function findUserId(keyword) {
+  var data = await apiFetch('/api/users?keyword=' + encodeURIComponent(keyword) + '&pageSize=1');
+  var list = data.data || data;
+  var rows = Array.isArray(list) ? list : (list.records || list.list || []);
+  if (rows.length === 0) throw new Error('未找到该用户');
+  return rows[0].id;
+}
+
 // Recharge
 var rechargeUserId = null;
 
 async function doRecharge() {
   var keyword = document.getElementById('recharge-user-search').value.trim();
   var amount = parseFloat(document.getElementById('recharge-amount').value);
-  var method = document.getElementById('recharge-method').value;
 
   if (!keyword) { showToast('请输入用户名或手机号', 'error'); return; }
   if (!amount || amount <= 0) { showToast('请输入有效充值金额', 'error'); return; }
 
   showLoading();
   try {
+    var userId = await findUserId(keyword);
     await apiFetch('/api/users/recharge', {
       method: 'POST',
-      body: JSON.stringify({ keyword: keyword, amount: amount, method: method })
+      body: JSON.stringify({ userId: userId, amount: amount })
     });
     showToast('充值成功', 'success');
     document.getElementById('recharge-amount').value = '';
@@ -1455,41 +1477,26 @@ async function doRecharge() {
 async function loadRechargePanel() {
   showLoading();
   try {
-    var rechargeData = await apiFetch('/api/report/summary');
-    var s = rechargeData.data || rechargeData || {};
+    var historyData = await apiFetch('/api/charge/history?page=1&pageSize=50');
 
-    var recordsHtml = '';
-    if (s.rechargeRecords && s.rechargeRecords.length > 0) {
-      s.rechargeRecords.forEach(function(r) {
-        recordsHtml += '<tr>';
-        recordsHtml += '<td>' + (r.id || '') + '</td>';
-        recordsHtml += '<td>' + (r.username || '') + '</td>';
-        recordsHtml += '<td>¥' + (r.amount || 0).toFixed(2) + '</td>';
-        recordsHtml += '<td>' + (r.method || '') + '</td>';
-        recordsHtml += '<td>¥' + (r.beforeBalance || 0).toFixed(2) + '</td>';
-        recordsHtml += '<td>¥' + (r.afterBalance || 0).toFixed(2) + '</td>';
-        recordsHtml += '<td>' + (r.createTime || '') + '</td>';
-        recordsHtml += '</tr>';
-      });
-    }
-    if (!recordsHtml) recordsHtml = '<tr><td colspan="7" class="empty-state">暂无充值记录</td></tr>';
-    document.getElementById('recharge-records-table').innerHTML = recordsHtml;
+    var histList = historyData.data || historyData || [];
+    if (!Array.isArray(histList)) histList = histList.records || histList.list || [];
 
     var consumeHtml = '';
-    if (s.consumeRecords && s.consumeRecords.length > 0) {
-      s.consumeRecords.forEach(function(r) {
-        consumeHtml += '<tr>';
-        consumeHtml += '<td>' + (r.id || '') + '</td>';
-        consumeHtml += '<td>' + (r.username || '') + '</td>';
-        consumeHtml += '<td>¥' + (r.amount || 0).toFixed(2) + '</td>';
-        consumeHtml += '<td>' + (r.type || '上机') + '</td>';
-        consumeHtml += '<td>¥' + (r.balance || 0).toFixed(2) + '</td>';
-        consumeHtml += '<td>' + (r.createTime || '') + '</td>';
-        consumeHtml += '</tr>';
-      });
-    }
+    histList.forEach(function(r) {
+      consumeHtml += '<tr>';
+      consumeHtml += '<td>' + (r.id || '') + '</td>';
+      consumeHtml += '<td>' + (r.username || '') + '</td>';
+      consumeHtml += '<td>¥' + (r.cost || 0).toFixed(2) + '</td>';
+      consumeHtml += '<td>上机消费</td>';
+      consumeHtml += '<td>' + (r.duration || '') + '</td>';
+      consumeHtml += '<td>' + (r.logoutTime || '') + '</td>';
+      consumeHtml += '</tr>';
+    });
     if (!consumeHtml) consumeHtml = '<tr><td colspan="6" class="empty-state">暂无消费记录</td></tr>';
     document.getElementById('consume-records-table').innerHTML = consumeHtml;
+
+    document.getElementById('recharge-records-table').innerHTML = '<tr><td colspan="7" class="empty-state">暂无充值记录</td></tr>';
   } catch (e) {
     showToast('加载充值数据失败: ' + e.message, 'error');
   } finally {
@@ -1510,9 +1517,9 @@ async function loadVipPanel() {
     var gridHtml = '';
     levels.forEach(function(l) {
       gridHtml += '<div class="vip-level-card">';
-      gridHtml += '<div class="vip-name">' + (l.name || '') + '</div>';
-      gridHtml += '<div class="vip-discount">' + ((l.discount || 0) * 100).toFixed(0) + '%</div>';
-      gridHtml += '<div class="vip-info">消费 ≥ ¥' + (l.threshold || 0).toFixed(2) + '</div>';
+      gridHtml += '<div class="vip-name">' + (l.levelName || '') + '</div>';
+      gridHtml += '<div class="vip-discount">' + ((l.discountRate || 0) * 100).toFixed(0) + '%</div>';
+      gridHtml += '<div class="vip-info">' + (l.description || '') + '</div>';
       gridHtml += '</div>';
     });
     document.getElementById('vip-levels-grid').innerHTML = gridHtml || '<div class="empty-state">暂无会员等级</div>';
@@ -1521,19 +1528,18 @@ async function loadVipPanel() {
     selectEl.innerHTML = '';
     levels.forEach(function(l) {
       var opt = document.createElement('option');
-      opt.value = l.id || l.name;
-      opt.textContent = l.name;
+      opt.value = l.id || l.levelName;
+      opt.textContent = l.levelName;
       selectEl.appendChild(opt);
     });
 
     var stats = statsData.data || statsData || {};
     var statsGrid = document.getElementById('vip-stats-grid');
     var statsHtml = '';
-    if (stats.levelCounts) {
-      Object.keys(stats.levelCounts).forEach(function(key) {
-        statsHtml += '<div class="stat-card"><div class="stat-label">' + key + '</div><div class="stat-value">' + stats.levelCounts[key] + '人</div></div>';
-      });
-    }
+    var distribution = stats.distribution || [];
+    distribution.forEach(function(d) {
+      statsHtml += '<div class="stat-card"><div class="stat-label">' + (d.levelName || '') + '</div><div class="stat-value">' + (d.userCount || 0) + '人</div></div>';
+    });
     if (stats.totalVipUsers !== undefined) {
       statsHtml += '<div class="stat-card primary"><div class="stat-label">VIP用户总数</div><div class="stat-value">' + stats.totalVipUsers + '</div></div>';
     }
@@ -1555,20 +1561,18 @@ function openVipLevelModal() {
     levels.forEach(function(l) {
       var opt = document.createElement('option');
       opt.value = l.id;
-      opt.textContent = l.name;
+      opt.textContent = l.levelName;
       select.appendChild(opt);
     });
     if (levels.length > 0) {
-      document.getElementById('vlm-name').value = levels[0].name || '';
-      document.getElementById('vlm-discount').value = levels[0].discount || 0;
-      document.getElementById('vlm-threshold').value = levels[0].threshold || 0;
+      document.getElementById('vlm-name').value = levels[0].levelName || '';
+      document.getElementById('vlm-discount').value = levels[0].discountRate || 0;
     }
     select.onchange = function() {
       var sel = levels.find(function(l) { return l.id == select.value; });
       if (sel) {
-        document.getElementById('vlm-name').value = sel.name || '';
-        document.getElementById('vlm-discount').value = sel.discount || 0;
-        document.getElementById('vlm-threshold').value = sel.threshold || 0;
+        document.getElementById('vlm-name').value = sel.levelName || '';
+        document.getElementById('vlm-discount').value = sel.discountRate || 0;
       }
     };
     hideLoading();
@@ -1585,17 +1589,13 @@ function closeVipLevelModal() {
 
 async function saveVipLevel() {
   var id = document.getElementById('vlm-level-select').value;
-  var name = document.getElementById('vlm-name').value.trim();
   var discount = parseFloat(document.getElementById('vlm-discount').value);
-  var threshold = parseFloat(document.getElementById('vlm-threshold').value);
-
-  if (!name) { showToast('请输入等级名称', 'error'); return; }
 
   showLoading();
   try {
     await apiFetch('/api/vip/levels/' + id, {
       method: 'PUT',
-      body: JSON.stringify({ name: name, discount: discount, threshold: threshold })
+      body: JSON.stringify({ discountRate: discount })
     });
     showToast('等级更新成功', 'success');
     closeVipLevelModal();
@@ -1615,9 +1615,10 @@ async function doVipUpgrade() {
 
   showLoading();
   try {
+    var userId = await findUserId(keyword);
     await apiFetch('/api/vip/upgrade', {
       method: 'POST',
-      body: JSON.stringify({ keyword: keyword, levelId: levelId })
+      body: JSON.stringify({ userId: userId, levelId: levelId })
     });
     showToast('升级成功', 'success');
     document.getElementById('vip-upgrade-user').value = '';
@@ -1638,10 +1639,10 @@ async function loadReports() {
     var monthly = await apiFetch('/api/report/monthly');
 
     var s = summary.data || summary || {};
-    document.getElementById('rpt-today-income').textContent = '¥' + (s.todayIncome || 0).toFixed(2);
-    document.getElementById('rpt-month-income').textContent = '¥' + (s.monthIncome || 0).toFixed(2);
+    document.getElementById('rpt-today-income').textContent = '¥' + (s.todayRevenue || 0).toFixed(2);
+    document.getElementById('rpt-month-income').textContent = '¥' + (s.monthRevenue || 0).toFixed(2);
     document.getElementById('rpt-today-recharge').textContent = '¥' + (s.todayRecharge || 0).toFixed(2);
-    document.getElementById('rpt-today-sessions').textContent = s.todaySessions || 0;
+    document.getElementById('rpt-today-sessions').textContent = s.todayOnlineCount || 0;
 
     var rankData = ranking.data || ranking || [];
     if (Array.isArray(rankData)) {
@@ -1652,7 +1653,8 @@ async function loadReports() {
       renderRanking('report-ranking', []);
     }
 
-    var monthlyData = monthly.data || monthly || [];
+    var monthlyResult = monthly.data || monthly || {};
+    var monthlyData = monthlyResult.monthlyStats || monthlyResult || [];
     if (!Array.isArray(monthlyData)) monthlyData = monthlyData.records || monthlyData.list || [];
     var chartEl = document.getElementById('monthly-chart');
     if (monthlyData.length > 0) {
@@ -1711,16 +1713,15 @@ async function loadLogs(page) {
 
     var tbody = document.getElementById('logs-table-body');
     if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无日志记录</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">暂无日志记录</td></tr>';
     } else {
       var html = '';
       rows.forEach(function(log) {
         html += '<tr>';
         html += '<td>' + (log.id || '') + '</td>';
-        html += '<td>' + (log.operator || '') + '</td>';
-        html += '<td>' + (log.type || '') + '</td>';
-        html += '<td>' + (log.description || '') + '</td>';
-        html += '<td>' + (log.ip || '') + '</td>';
+        html += '<td>' + (log.operatorName || '') + '</td>';
+        html += '<td>' + (log.operationType || '') + '</td>';
+        html += '<td>' + (log.operationContent || '') + '</td>';
         html += '<td>' + (log.createTime || '') + '</td>';
         html += '</tr>';
       });
@@ -1742,10 +1743,15 @@ async function loadLogs(page) {
 }
 
 async function cleanLogs() {
-  if (!confirm('确定要清空所有日志吗？此操作不可恢复。')) return;
+  var date = prompt('请输入要清理的日期（格式：YYYY-MM-DD），留空则清空所有日志：');
+  if (date === null) return;
+  var confirmMsg = date ? '确定要清空 ' + date + ' 的日志吗？此操作不可恢复。' : '确定要清空所有日志吗？此操作不可恢复。';
+  if (!confirm(confirmMsg)) return;
   showLoading();
   try {
-    await apiFetch('/api/logs/clean', { method: 'DELETE' });
+    var url = '/api/logs/clean';
+    if (date) url += '?date=' + encodeURIComponent(date);
+    await apiFetch(url, { method: 'DELETE' });
     showToast('日志已清空', 'success');
     loadLogs(1);
   } catch (e) {

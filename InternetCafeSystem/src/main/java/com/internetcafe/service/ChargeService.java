@@ -284,6 +284,16 @@ public class ChargeService {
     }
 
     /**
+     * 根据记录ID查询上机记录
+     *
+     * @param recordId 记录ID
+     * @return 上机记录，不存在返回null
+     */
+    public OnlineRecord getRecordById(Integer recordId) {
+        return onlineRecordDao.findById(recordId);
+    }
+
+    /**
      * 根据用户ID查询该用户的所有上机记录
      * 包括历史记录和当前活跃记录，按上机时间降序排列。
      *

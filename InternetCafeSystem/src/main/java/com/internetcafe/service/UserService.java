@@ -128,6 +128,26 @@ public class UserService {
             user.setPassword(existingUser.getPassword());
         }
 
+        /* 将未传入的字段用数据库现有值填充，避免null覆盖 */
+        if (ValidationUtil.isEmpty(user.getRealName())) {
+            user.setRealName(existingUser.getRealName());
+        }
+        if (ValidationUtil.isEmpty(user.getIdCard())) {
+            user.setIdCard(existingUser.getIdCard());
+        }
+        if (user.getBalance() == null) {
+            user.setBalance(existingUser.getBalance());
+        }
+        if (user.getVipLevel() == null) {
+            user.setVipLevel(existingUser.getVipLevel());
+        }
+        if (user.getPoints() == null) {
+            user.setPoints(existingUser.getPoints());
+        }
+        if (user.getStatus() == null) {
+            user.setStatus(existingUser.getStatus());
+        }
+
         int result = userDao.update(user);
         if (result > 0) {
             System.out.println("更新用户信息成功：用户ID=" + user.getId() + "，用户名=" + user.getUsername());

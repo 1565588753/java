@@ -220,6 +220,17 @@ public class ChargeController extends BaseController implements HttpHandler {
 
         /* 调用服务层停止上机并结算 */
         try {
+            /* 检查记录是否存在且状态为"上机中" */
+            OnlineRecord record = chargeService.getRecordById(recordId);
+            if (record == null) {
+                sendError(exchange, 400, "上机记录不存在");
+                return;
+            }
+            if (record.getStatus() != 1) {
+                sendError(exchange, 400, "该记录已结算，请勿重复操作");
+                return;
+            }
+
             BigDecimal cost = chargeService.stopOnline(recordId);
 
             Map<String, Object> response = new HashMap<>();
