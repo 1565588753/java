@@ -3,6 +3,7 @@ package com.internetcafe.controller;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.internetcafe.entity.Admin;
+import com.internetcafe.entity.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,6 +41,8 @@ public class BaseController {
      * 通过此Map实现无状态HTTP服务中的会话保持机制
      */
     protected static final Map<String, Admin> sessionMap = new ConcurrentHashMap<>();
+
+    protected static final Map<String, User> userSessionMap = new ConcurrentHashMap<>();
 
     /**
      * 将Java对象序列化为JSON字符串，并通过HTTP响应发送给客户端
@@ -193,6 +196,48 @@ public class BaseController {
             return sessionMap.get(token);
         }
 
+        return null;
+    }
+
+    /**
+     * 从HTTP请求中获取当前已登录的用户对象（普通用户）
+     * 优先从Cookie中读取token，如果没有则从Authorization请求头中读取
+     *
+     * @param exchange HTTP交换对象
+     * @return 已登录的User对象，未登录返回null
+     */
+    protected static User getUserSession(HttpExchange exchange) {
+        String token = null;
+
+        List<String> cookieHeaders = exchange.getRequestHeaders().get("Cookie");
+        if (cookieHeaders != null) {
+            for (String cookieHeader : cookieHeaders) {
+                for (String cookieStr : cookieHeader.split(";")) {
+                    cookieStr = cookieStr.trim();
+                    if (cookieStr.startsWith("token=")) {
+                        token = cookieStr.substring("token=".length());
+                        break;
+                    }
+                }
+                if (token != null) {
+                    break;
+                }
+            }
+        }
+
+        if (token == null) {
+            List<String> authHeaders = exchange.getRequestHeaders().get("Authorization");
+            if (authHeaders != null && !authHeaders.isEmpty()) {
+                String authHeader = authHeaders.get(0);
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    token = authHeader.substring("Bearer ".length()).trim();
+                }
+            }
+        }
+
+        if (token != null && !token.isEmpty()) {
+            return userSessionMap.get(token);
+        }
         return null;
     }
 

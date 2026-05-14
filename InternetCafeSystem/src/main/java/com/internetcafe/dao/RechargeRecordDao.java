@@ -180,6 +180,45 @@ public class RechargeRecordDao {
         return list;
     }
 
+    public List<RechargeRecord> findByUserId(Integer userId, int limit) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<RechargeRecord> list = new ArrayList<>();
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) {
+                System.err.println("错误：获取数据库连接失败！");
+                return list;
+            }
+            String sql = "SELECT r.id, r.user_id, u.username, r.amount, r.recharge_time, r.operator_name " +
+                         "FROM recharge_record r " +
+                         "LEFT JOIN user u ON r.user_id = u.id " +
+                         "WHERE r.user_id = ? " +
+                         "ORDER BY r.recharge_time DESC LIMIT ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, limit);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                RechargeRecord record = new RechargeRecord();
+                record.setId(rs.getInt("id"));
+                record.setUserId(rs.getInt("user_id"));
+                record.setUsername(rs.getString("username"));
+                record.setAmount(rs.getBigDecimal("amount"));
+                record.setRechargeTime(rs.getString("recharge_time"));
+                record.setOperatorName(rs.getString("operator_name"));
+                list.add(record);
+            }
+        } catch (SQLException e) {
+            System.err.println("错误：根据用户ID查询充值记录失败: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            DBUtil.closeAll(conn, pstmt, rs);
+        }
+        return list;
+    }
+
     /**
      * 统计今日充值总金额
      * 查询今天（以服务器当前日期为准）所有充值记录的金额总和。

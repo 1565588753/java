@@ -161,6 +161,51 @@ public class ConsumeRecordDao {
         return list;
     }
 
+    public List<ConsumeRecord> findByUserId(Integer userId, int limit) {
+        String sql = "SELECT cr.id, cr.user_id, u.username, cr.amount, cr.consume_type, cr.create_time " +
+                     "FROM consume_record cr " +
+                     "LEFT JOIN user u ON cr.user_id = u.id " +
+                     "WHERE cr.user_id = ? " +
+                     "ORDER BY cr.create_time DESC LIMIT ?";
+
+        List<ConsumeRecord> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) {
+                System.err.println("错误: 按用户ID查询消费记录时无法获取数据库连接！");
+                return list;
+            }
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, limit);
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                ConsumeRecord record = new ConsumeRecord();
+                record.setId(rs.getInt("id"));
+                record.setUserId(rs.getInt("user_id"));
+                record.setUsername(rs.getString("username"));
+                record.setAmount(rs.getBigDecimal("amount"));
+                record.setConsumeType(rs.getString("consume_type"));
+                record.setCreateTime(rs.getString("create_time"));
+                list.add(record);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("错误: 按用户ID查询消费记录失败: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            DBUtil.closeAll(conn, pstmt, rs);
+        }
+
+        return list;
+    }
+
     /**
      * 获取今日消费总额
      * 统计当天所有消费记录的总金额，用于首页概览展示。

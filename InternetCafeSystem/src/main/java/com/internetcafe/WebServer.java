@@ -129,6 +129,7 @@ public class WebServer {
             server.createContext("/api/login", loginController);
             server.createContext("/api/logout", loginController);
             server.createContext("/api/session", loginController);
+            server.createContext("/api/user", loginController);
 
             /* 注册用户管理路由 */
             server.createContext("/api/users", new UserController());

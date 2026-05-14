@@ -453,6 +453,24 @@ public class UserDao {
         return user;
     }
 
+    public boolean updatePassword(Integer userId, String encryptedPassword) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = DBUtil.getConnection();
+            String sql = "UPDATE user SET password = ? WHERE id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, encryptedPassword);
+            pstmt.setInt(2, userId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("更新用户密码（userId=" + userId + "）时发生异常: " + e.getMessage());
+            return false;
+        } finally {
+            DBUtil.closeAll(conn, pstmt);
+        }
+    }
+
     public int getNewUsersByDateRange(String startDate, String endDate) {
         Connection conn = null;
         PreparedStatement pstmt = null;

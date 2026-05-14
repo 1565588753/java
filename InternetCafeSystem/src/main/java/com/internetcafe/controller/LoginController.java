@@ -1,16 +1,26 @@
 package com.internetcafe.controller;
 
 import com.internetcafe.dao.AdminDao;
+import com.internetcafe.dao.ConsumeRecordDao;
+import com.internetcafe.dao.OnlineRecordDao;
+import com.internetcafe.dao.RechargeRecordDao;
 import com.internetcafe.dao.SystemLogDao;
+import com.internetcafe.dao.UserDao;
 import com.internetcafe.entity.Admin;
+import com.internetcafe.entity.ConsumeRecord;
+import com.internetcafe.entity.OnlineRecord;
+import com.internetcafe.entity.RechargeRecord;
 import com.internetcafe.entity.SystemLog;
+import com.internetcafe.entity.User;
 import com.internetcafe.util.DateUtil;
 import com.internetcafe.util.PasswordUtil;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,6 +47,18 @@ public class LoginController extends BaseController implements HttpHandler {
     /** 系统日志数据访问对象，用于记录登录/登出操作日志 */
     private SystemLogDao systemLogDao;
 
+    /** 用户数据访问对象，用于普通用户登录验证 */
+    private UserDao userDao;
+
+    /** 消费记录数据访问对象 */
+    private ConsumeRecordDao consumeRecordDao;
+
+    /** 充值记录数据访问对象 */
+    private RechargeRecordDao rechargeRecordDao;
+
+    /** 上机记录数据访问对象 */
+    private OnlineRecordDao onlineRecordDao;
+
     private static final int MAX_LOGIN_ATTEMPTS = 5;
     private static final long LOCK_DURATION_MS = 15 * 60 * 1000;
 
@@ -49,6 +71,10 @@ public class LoginController extends BaseController implements HttpHandler {
     public LoginController() {
         this.adminDao = new AdminDao();
         this.systemLogDao = new SystemLogDao();
+        this.userDao = new UserDao();
+        this.consumeRecordDao = new ConsumeRecordDao();
+        this.rechargeRecordDao = new RechargeRecordDao();
+        this.onlineRecordDao = new OnlineRecordDao();
     }
 
     /**
@@ -79,6 +105,16 @@ public class LoginController extends BaseController implements HttpHandler {
                 handleLogout(exchange);
             } else if ("GET".equals(method) && "/api/session".equals(path)) {
                 handleSession(exchange);
+            } else if ("GET".equals(method) && "/api/user/profile".equals(path)) {
+                handleUserProfile(exchange);
+            } else if ("GET".equals(method) && "/api/user/consumes".equals(path)) {
+                handleUserConsumes(exchange);
+            } else if ("GET".equals(method) && "/api/user/recharges".equals(path)) {
+                handleUserRecharges(exchange);
+            } else if ("GET".equals(method) && "/api/user/online-status".equals(path)) {
+                handleUserOnlineStatus(exchange);
+            } else if ("PUT".equals(method) && "/api/user/password".equals(path)) {
+                handleUserChangePassword(exchange);
             } else {
                 sendError(exchange, 404, "接口不存在: " + method + " " + path);
             }
@@ -128,13 +164,25 @@ public class LoginController extends BaseController implements HttpHandler {
         }
 
         Admin admin = adminDao.findByUsername(username);
+        User user = null;
+
         if (admin == null) {
+            user = userDao.findByUsername(username);
+        }
+
+        if (admin == null && user == null) {
             recordLoginFailure(username);
             sendError(exchange, 401, "用户名或密码错误");
             return;
         }
 
-        boolean passwordValid = PasswordUtil.verify(password, admin.getPassword());
+        boolean passwordValid;
+        if (admin != null) {
+            passwordValid = PasswordUtil.verify(password, admin.getPassword());
+        } else {
+            passwordValid = PasswordUtil.verify(password, user.getPassword());
+        }
+
         if (!passwordValid) {
             recordLoginFailure(username);
             sendError(exchange, 401, "用户名或密码错误");
@@ -144,39 +192,51 @@ public class LoginController extends BaseController implements HttpHandler {
         loginFailCount.remove(username);
         accountLockTime.remove(username);
 
-        /* 生成唯一的会话令牌 */
         String token = UUID.randomUUID().toString().replace("-", "");
 
-        /* 将令牌和管理员对象存入会话Map */
-        sessionMap.put(token, admin);
-
-        /* 记录登录日志 */
-        SystemLog loginLog = new SystemLog();
-        loginLog.setOperatorName(admin.getUsername());
-        loginLog.setOperationType("登录");
-        loginLog.setOperationContent("管理员 [" + admin.getUsername() + "] 通过Web端登录系统，角色：" + admin.getRole());
-        loginLog.setCreateTime(DateUtil.getCurrentDateTime());
-        systemLogDao.insert(loginLog);
-
-        /* 构建响应数据：令牌 + 管理员信息（不包含密码） */
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
 
-        /* 构建不包含密码的管理员信息 */
-        Map<String, Object> adminInfo = new HashMap<>();
-        adminInfo.put("id", admin.getId());
-        adminInfo.put("username", admin.getUsername());
-        adminInfo.put("role", admin.getRole());
-        adminInfo.put("createTime", admin.getCreateTime());
-        response.put("admin", adminInfo);
+        if (admin != null) {
+            sessionMap.put(token, admin);
 
-        /* 设置Cookie响应头，让浏览器自动保存token */
+            SystemLog loginLog = new SystemLog();
+            loginLog.setOperatorName(admin.getUsername());
+            loginLog.setOperationType("登录");
+            loginLog.setOperationContent("管理员 [" + admin.getUsername() + "] 通过Web端登录系统，角色：" + admin.getRole());
+            loginLog.setCreateTime(DateUtil.getCurrentDateTime());
+            systemLogDao.insert(loginLog);
+
+            Map<String, Object> adminInfo = new HashMap<>();
+            adminInfo.put("id", admin.getId());
+            adminInfo.put("username", admin.getUsername());
+            adminInfo.put("role", admin.getRole());
+            adminInfo.put("createTime", admin.getCreateTime());
+            response.put("admin", adminInfo);
+            response.put("accountType", "admin");
+
+            System.out.println("管理员 [" + admin.getUsername() + "] 通过Web端登录成功，token=" + token.substring(0, 8) + "...");
+        } else {
+            userSessionMap.put(token, user);
+
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("id", user.getId());
+            userInfo.put("username", user.getUsername());
+            userInfo.put("realName", user.getRealName());
+            userInfo.put("balance", user.getBalance());
+            userInfo.put("vipLevel", user.getVipLevel());
+            userInfo.put("points", user.getPoints());
+            userInfo.put("phone", user.getPhone());
+            response.put("user", userInfo);
+            response.put("accountType", "user");
+
+            System.out.println("用户 [" + user.getUsername() + "] 通过Web端登录成功，token=" + token.substring(0, 8) + "...");
+        }
+
         exchange.getResponseHeaders().set("Set-Cookie",
                 "token=" + token + "; Path=/; HttpOnly; Max-Age=86400");
 
         sendJson(exchange, response);
-
-        System.out.println("管理员 [" + admin.getUsername() + "] 通过Web端登录成功，token=" + token.substring(0, 8) + "...");
     }
 
     /**
@@ -188,39 +248,31 @@ public class LoginController extends BaseController implements HttpHandler {
      * @throws IOException 当发送响应时发生I/O错误
      */
     private void handleLogout(HttpExchange exchange) throws IOException {
-        /* 获取当前会话的管理员信息 */
-        Admin admin = getSession(exchange);
-        if (admin == null) {
-            sendError(exchange, 401, "未登录或会话已过期");
-            return;
-        }
-
-        /* 获取当前请求的token */
         String token = getTokenFromRequest(exchange);
         if (token != null) {
-            /* 从会话Map中移除该token */
-            sessionMap.remove(token);
+            Admin admin = sessionMap.remove(token);
+            if (admin != null) {
+                SystemLog logoutLog = new SystemLog();
+                logoutLog.setOperatorName(admin.getUsername());
+                logoutLog.setOperationType("登出");
+                logoutLog.setOperationContent("管理员 [" + admin.getUsername() + "] 退出登录");
+                logoutLog.setCreateTime(DateUtil.getCurrentDateTime());
+                systemLogDao.insert(logoutLog);
+                System.out.println("管理员 [" + admin.getUsername() + "] 已退出登录");
+            }
+            User user = userSessionMap.remove(token);
+            if (user != null) {
+                System.out.println("用户 [" + user.getUsername() + "] 已退出登录");
+            }
         }
 
-        /* 记录登出日志 */
-        SystemLog logoutLog = new SystemLog();
-        logoutLog.setOperatorName(admin.getUsername());
-        logoutLog.setOperationType("登出");
-        logoutLog.setOperationContent("管理员 [" + admin.getUsername() + "] 通过Web端退出系统");
-        logoutLog.setCreateTime(DateUtil.getCurrentDateTime());
-        systemLogDao.insert(logoutLog);
-
-        /* 清除浏览器Cookie中的token */
         exchange.getResponseHeaders().set("Set-Cookie",
                 "token=; Path=/; HttpOnly; Max-Age=0");
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
-        response.put("message", "登出成功");
-
+        response.put("message", "已退出登录");
         sendJson(exchange, response);
-
-        System.out.println("管理员 [" + admin.getUsername() + "] 通过Web端登出成功");
     }
 
     /**
@@ -232,26 +284,43 @@ public class LoginController extends BaseController implements HttpHandler {
      * @throws IOException 当发送响应时发生I/O错误
      */
     private void handleSession(HttpExchange exchange) throws IOException {
+        String token = getTokenFromRequest(exchange);
+
         Admin admin = getSession(exchange);
-        if (admin == null) {
-            /* 未登录状态 */
+        if (admin != null) {
             Map<String, Object> response = new HashMap<>();
-            response.put("loggedIn", false);
+            response.put("loggedIn", true);
+            response.put("accountType", "admin");
+            Map<String, Object> adminInfo = new HashMap<>();
+            adminInfo.put("id", admin.getId());
+            adminInfo.put("username", admin.getUsername());
+            adminInfo.put("role", admin.getRole());
+            adminInfo.put("createTime", admin.getCreateTime());
+            response.put("admin", adminInfo);
             sendJson(exchange, response);
             return;
         }
 
-        /* 已登录状态 —— 返回管理员信息（不包含密码） */
+        User user = getUserSession(exchange);
+        if (user != null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("loggedIn", true);
+            response.put("accountType", "user");
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("id", user.getId());
+            userInfo.put("username", user.getUsername());
+            userInfo.put("realName", user.getRealName());
+            userInfo.put("balance", user.getBalance());
+            userInfo.put("vipLevel", user.getVipLevel());
+            userInfo.put("points", user.getPoints());
+            userInfo.put("phone", user.getPhone());
+            response.put("user", userInfo);
+            sendJson(exchange, response);
+            return;
+        }
+
         Map<String, Object> response = new HashMap<>();
-        response.put("loggedIn", true);
-
-        Map<String, Object> adminInfo = new HashMap<>();
-        adminInfo.put("id", admin.getId());
-        adminInfo.put("username", admin.getUsername());
-        adminInfo.put("role", admin.getRole());
-        adminInfo.put("createTime", admin.getCreateTime());
-        response.put("admin", adminInfo);
-
+        response.put("loggedIn", false);
         sendJson(exchange, response);
     }
 
@@ -286,6 +355,121 @@ public class LoginController extends BaseController implements HttpHandler {
         }
 
         return null;
+    }
+
+    private void handleUserProfile(HttpExchange exchange) throws IOException {
+        User user = getUserSession(exchange);
+        if (user == null) {
+            sendError(exchange, 401, "请先登录");
+            return;
+        }
+        User freshUser = userDao.findById(user.getId());
+        Map<String, Object> resp = new HashMap<>();
+        if (freshUser != null) {
+            resp.put("id", freshUser.getId());
+            resp.put("username", freshUser.getUsername());
+            resp.put("realName", freshUser.getRealName());
+            resp.put("balance", freshUser.getBalance());
+            resp.put("vipLevel", freshUser.getVipLevel());
+            resp.put("points", freshUser.getPoints());
+            resp.put("phone", freshUser.getPhone());
+        }
+        sendJson(exchange, resp);
+    }
+
+    private void handleUserConsumes(HttpExchange exchange) throws IOException {
+        User user = getUserSession(exchange);
+        if (user == null) {
+            sendError(exchange, 401, "请先登录");
+            return;
+        }
+        List<ConsumeRecord> records = consumeRecordDao.findByUserId(user.getId(), 20);
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (records != null) {
+            for (ConsumeRecord r : records) {
+                Map<String, Object> m = new HashMap<>();
+                m.put("id", r.getId());
+                m.put("amount", r.getAmount());
+                m.put("consumeType", r.getConsumeType());
+                m.put("createTime", r.getCreateTime());
+                list.add(m);
+            }
+        }
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("records", list);
+        sendJson(exchange, resp);
+    }
+
+    private void handleUserRecharges(HttpExchange exchange) throws IOException {
+        User user = getUserSession(exchange);
+        if (user == null) {
+            sendError(exchange, 401, "请先登录");
+            return;
+        }
+        List<RechargeRecord> records = rechargeRecordDao.findByUserId(user.getId(), 20);
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (records != null) {
+            for (RechargeRecord r : records) {
+                Map<String, Object> m = new HashMap<>();
+                m.put("id", r.getId());
+                m.put("amount", r.getAmount());
+                m.put("rechargeTime", r.getRechargeTime());
+                m.put("operatorName", r.getOperatorName());
+                list.add(m);
+            }
+        }
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("records", list);
+        sendJson(exchange, resp);
+    }
+
+    private void handleUserOnlineStatus(HttpExchange exchange) throws IOException {
+        User user = getUserSession(exchange);
+        if (user == null) {
+            sendError(exchange, 401, "请先登录");
+            return;
+        }
+        OnlineRecord activeRecord = onlineRecordDao.findActiveByUserId(user.getId());
+        Map<String, Object> resp = new HashMap<>();
+        if (activeRecord != null) {
+            resp.put("online", true);
+            resp.put("loginTime", activeRecord.getLoginTime());
+            resp.put("machineNo", activeRecord.getMachineNo());
+            resp.put("durationMinutes", DateUtil.getMinutesBetween(
+                    activeRecord.getLoginTime(), DateUtil.getCurrentDateTime()));
+        } else {
+            resp.put("online", false);
+        }
+        sendJson(exchange, resp);
+    }
+
+    private void handleUserChangePassword(HttpExchange exchange) throws IOException {
+        User user = getUserSession(exchange);
+        if (user == null) {
+            sendError(exchange, 401, "请先登录");
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, String> params = parseBody(exchange, Map.class);
+        String oldPassword = params.get("oldPassword");
+        String newPassword = params.get("newPassword");
+
+        if (oldPassword == null || oldPassword.isEmpty() || newPassword == null || newPassword.isEmpty()) {
+            sendError(exchange, 400, "密码不能为空");
+            return;
+        }
+
+        if (!PasswordUtil.verify(oldPassword, user.getPassword())) {
+            sendError(exchange, 400, "原密码错误");
+            return;
+        }
+
+        String encryptedPassword = PasswordUtil.encrypt(newPassword);
+        boolean success = userDao.updatePassword(user.getId(), encryptedPassword);
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("success", success);
+        resp.put("message", success ? "密码修改成功" : "密码修改失败");
+        sendJson(exchange, resp);
     }
 
     private void recordLoginFailure(String username) {
