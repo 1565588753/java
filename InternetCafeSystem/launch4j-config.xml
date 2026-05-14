@@ -1,54 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-    网吧计费管理系统 - Launch4j 配置文件
-    用于将可执行 JAR 包装为 Windows .exe 程序
-    
-    使用方法：
-    1. 下载 Launch4j: https://launch4j.sourceforge.net/
-    2. 打开 Launch4j，导入此配置文件
-    3. 点击 "Build wrapper" 生成 .exe
-    
-    或使用命令行：
-    launch4jc.exe launch4j-config.xml
--->
 <launch4jConfig>
-    <!-- 基本信息 -->
     <headerType>gui</headerType>
-    <outfile>InternetCafeSystem.exe</outfile>
-    <jar>InternetCafeSystem.jar</jar>
+    <outfile>/workspace/InternetCafeSystem/InternetCafeSystem.exe</outfile>
+    <jar>/workspace/InternetCafeSystem/InternetCafeSystem.jar</jar>
     <dontWrapJar>false</dontWrapJar>
     
-    <!-- 程序图标（需要准备 .ico 文件） -->
-    <icon>app-icon.ico</icon>
-    
-    <!-- 显示名称 -->
-    <errTitle>网吧计费管理系统 - 错误</errTitle>
+    <errTitle>网吧计费管理系统 - 启动错误</errTitle>
     <chdir>.</chdir>
     <stayAlive>false</stayAlive>
     
-    <!-- JRE 配置 -->
     <jre>
-        <path>jre</path>
+        <path>jre;%JAVA_HOME%;%PATH%</path>
         <bundledJre64Bit>true</bundledJre64Bit>
-        <bundledJreAsFallback>false</bundledJreAsFallback>
+        <bundledJreAsFallback>true</bundledJreAsFallback>
         <minVersion>1.8.0</minVersion>
         <maxVersion></maxVersion>
-        <jdkPreference>jreOnly</jdkPreference>
+        <jdkPreference>preferJre</jdkPreference>
         <runtimeBits>64/32</runtimeBits>
         <initialHeapSize>64</initialHeapSize>
         <maxHeapSize>512</maxHeapSize>
-        
-        <!-- JVM 参数 -->
         <opt>-Dfile.encoding=UTF-8</opt>
         <opt>-Dsun.java2d.d3d=false</opt>
     </jre>
     
-    <!-- 版本信息（右键属性可见） -->
     <versionInfo>
         <fileVersion>1.0.0.0</fileVersion>
         <txtFileVersion>1.0.0</txtFileVersion>
         <fileDescription>网吧计费管理系统</fileDescription>
-        <copyright>InternetCafeSystem © 2026</copyright>
+        <copyright>InternetCafeSystem 2026</copyright>
         <productVersion>1.0.0.0</productVersion>
         <txtProductVersion>1.0.0</txtProductVersion>
         <productName>网吧计费管理系统</productName>
