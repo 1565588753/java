@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Multi-Release: true
+
+Name: org/apache/xmlbeans/
+Implementation-Title: Apache XmlBeans
+Implementation-Version: 5.1.1
+Build-Timestamp: 2022-08-19T08:48:10.752+0000
+Built-By: jenkins
+Specification-Vendor: The Apache Software Foundation
+Specification-Title: Apache XmlBeans
+Implementation-Vendor-Id: The Apache Software Foundation
+Implementation-Vendor: org.apache.xmlbeans
+Comment: Apache XmlBeans version 5.1.1
+Build-OS: Linux amd64 4.15.0-191-generic
+Specification-Version: 5.1.1
+Created-By: Gradle 7.5
+Build-Jdk: 1.8.0_291 (Oracle Corporation 25.291-b10)
+
