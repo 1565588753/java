@@ -238,4 +238,44 @@ public class ReportService {
 
         return result;
     }
+
+    /**
+     * 获取会员增长趋势统计
+     * 按月份统计新增用户数量，反映会员增长趋势
+     *
+     * @param year 要统计的年份
+     * @return 包含每月新增用户数的列表
+     */
+    public List<Map<String, Object>> getMemberGrowthTrend(int year) {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (int month = 1; month <= 12; month++) {
+            String startDate = String.format("%d-%02d-01", year, month);
+
+            int lastDay;
+            switch (month) {
+                case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+                    lastDay = 31; break;
+                case 4: case 6: case 9: case 11:
+                    lastDay = 30; break;
+                case 2:
+                    boolean isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+                    lastDay = isLeapYear ? 29 : 28;
+                    break;
+                default:
+                    lastDay = 30; break;
+            }
+
+            String endDate = String.format("%d-%02d-%02d", year, month, lastDay);
+
+            int newUsers = userDao.getNewUsersByDateRange(startDate, endDate);
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("month", month);
+            map.put("newUsers", newUsers);
+            result.add(map);
+        }
+
+        return result;
+    }
 }

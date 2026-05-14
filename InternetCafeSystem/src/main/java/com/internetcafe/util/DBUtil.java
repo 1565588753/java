@@ -3,10 +3,17 @@ package com.internetcafe.util;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.internetcafe.config.DBConfig;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * 数据库工具类
@@ -197,6 +204,108 @@ public class DBUtil {
      */
     public static boolean isInitialized() {
         return initialized;
+    }
+
+    public static void beginTransaction(Connection conn) throws SQLException {
+        if (conn != null) {
+            conn.setAutoCommit(false);
+        }
+    }
+
+    public static void commitTransaction(Connection conn) throws SQLException {
+        if (conn != null) {
+            conn.commit();
+            conn.setAutoCommit(true);
+        }
+    }
+
+    public static void rollbackTransaction(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.rollback();
+                conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                System.err.println("事务回滚失败: " + e.getMessage());
+            }
+        }
+    }
+
+    public static String backupDatabase() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String timestamp = sdf.format(new Date());
+        String backupDir = "backup";
+        File dir = new File(backupDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String backupFile = backupDir + "/internet_cafe_backup_" + timestamp + ".sql";
+        try (FileWriter writer = new FileWriter(backupFile)) {
+            writer.write("-- ==========================================\n");
+            writer.write("-- 网吧计费管理系统 - 数据备份\n");
+            writer.write("-- 备份时间: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\n");
+            writer.write("-- ==========================================\n\n");
+
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.err.println("数据备份失败：无法获取数据库连接");
+                return null;
+            }
+
+            try {
+                DatabaseMetaData metaData = conn.getMetaData();
+                String[] types = {"TABLE"};
+                ResultSet tables = metaData.getTables(null, null, "%", types);
+
+                while (tables.next()) {
+                    String tableName = tables.getString("TABLE_NAME");
+                    if (tableName == null) continue;
+
+                    writer.write("-- 表结构: " + tableName + "\n");
+                    writer.write("DROP TABLE IF EXISTS " + tableName + ";\n");
+
+                    Statement stmt = conn.createStatement();
+                    ResultSet showCreate = stmt.executeQuery("SHOW CREATE TABLE " + tableName);
+                    if (showCreate.next()) {
+                        writer.write(showCreate.getString(2) + ";\n\n");
+                    }
+                    showCreate.close();
+                    stmt.close();
+
+                    writer.write("-- 表数据: " + tableName + "\n");
+                    Statement dataStmt = conn.createStatement();
+                    ResultSet data = dataStmt.executeQuery("SELECT * FROM " + tableName);
+                    ResultSetMetaData rsmd = data.getMetaData();
+                    int columnCount = rsmd.getColumnCount();
+
+                    while (data.next()) {
+                        StringBuilder row = new StringBuilder("INSERT INTO " + tableName + " VALUES (");
+                        for (int i = 1; i <= columnCount; i++) {
+                            String value = data.getString(i);
+                            if (value == null) {
+                                row.append("NULL");
+                            } else {
+                                row.append("'").append(value.replace("'", "\\'")).append("'");
+                            }
+                            if (i < columnCount) row.append(", ");
+                        }
+                        row.append(");\n");
+                        writer.write(row.toString());
+                    }
+                    writer.write("\n");
+                    data.close();
+                    dataStmt.close();
+                }
+                tables.close();
+                System.out.println("数据备份成功: " + backupFile);
+                return backupFile;
+            } finally {
+                closeAll(conn, null);
+            }
+        } catch (Exception e) {
+            System.err.println("数据备份失败: " + e.getMessage());
+            return null;
+        }
     }
 
     /**

@@ -4,11 +4,13 @@ import com.internetcafe.dao.RechargeRecordDao;
 import com.internetcafe.dao.UserDao;
 import com.internetcafe.entity.RechargeRecord;
 import com.internetcafe.entity.User;
+import com.internetcafe.util.DBUtil;
 import com.internetcafe.util.DateUtil;
 import com.internetcafe.util.PasswordUtil;
 import com.internetcafe.util.ValidationUtil;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.List;
 
 /**
@@ -288,36 +290,56 @@ public class UserService {
             return false;
         }
 
-        User user = userDao.findById(userId);
-        if (user == null) {
-            System.err.println("充值失败：用户ID [" + userId + "] 对应的用户不存在");
+        Connection conn = null;
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) {
+                System.err.println("充值失败：无法获取数据库连接");
+                return false;
+            }
+            DBUtil.beginTransaction(conn);
+
+            User user = userDao.findById(userId);
+            if (user == null) {
+                DBUtil.rollbackTransaction(conn);
+                System.err.println("充值失败：用户ID [" + userId + "] 对应的用户不存在");
+                return false;
+            }
+
+            BigDecimal currentBalance = user.getBalance() != null ? user.getBalance() : BigDecimal.ZERO;
+            BigDecimal newBalance = currentBalance.add(amount);
+
+            int updateResult = userDao.updateBalance(userId, newBalance);
+            if (updateResult <= 0) {
+                DBUtil.rollbackTransaction(conn);
+                System.err.println("充值失败：更新用户余额时发生数据库异常，用户ID=" + userId);
+                return false;
+            }
+
+            RechargeRecord record = new RechargeRecord();
+            record.setUserId(userId);
+            record.setUsername(user.getUsername());
+            record.setAmount(amount);
+            record.setRechargeTime(DateUtil.getCurrentDateTime());
+            record.setOperatorName(operatorName);
+
+            Integer recordId = rechargeRecordDao.insert(record);
+            if (recordId == null || recordId <= 0) {
+                DBUtil.rollbackTransaction(conn);
+                System.err.println("充值失败：创建充值记录失败，用户ID=" + userId);
+                return false;
+            }
+
+            DBUtil.commitTransaction(conn);
+            System.out.println("充值成功：用户 [" + user.getUsername() + "] 充值 " + amount + " 元，"
+                    + "操作员=" + operatorName + "，充值后余额=" + newBalance);
+            return true;
+        } catch (Exception e) {
+            DBUtil.rollbackTransaction(conn);
+            System.err.println("充值异常：" + e.getMessage());
             return false;
+        } finally {
+            DBUtil.closeAll(conn, null);
         }
-
-        BigDecimal currentBalance = user.getBalance() != null ? user.getBalance() : BigDecimal.ZERO;
-        BigDecimal newBalance = currentBalance.add(amount);
-
-        int updateResult = userDao.updateBalance(userId, newBalance);
-        if (updateResult <= 0) {
-            System.err.println("充值失败：更新用户余额时发生数据库异常，用户ID=" + userId);
-            return false;
-        }
-
-        RechargeRecord record = new RechargeRecord();
-        record.setUserId(userId);
-        record.setUsername(user.getUsername());
-        record.setAmount(amount);
-        record.setRechargeTime(DateUtil.getCurrentDateTime());
-        record.setOperatorName(operatorName);
-
-        Integer recordId = rechargeRecordDao.insert(record);
-        if (recordId == null || recordId <= 0) {
-            System.err.println("警告：用户余额已更新，但充值记录创建失败，用户ID=" + userId + "，充值金额=" + amount);
-            return false;
-        }
-
-        System.out.println("充值成功：用户 [" + user.getUsername() + "] 充值 " + amount + " 元，"
-                + "操作员=" + operatorName + "，充值后余额=" + newBalance);
-        return true;
     }
 }

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 登录控制器
@@ -35,6 +36,12 @@ public class LoginController extends BaseController implements HttpHandler {
 
     /** 系统日志数据访问对象，用于记录登录/登出操作日志 */
     private SystemLogDao systemLogDao;
+
+    private static final int MAX_LOGIN_ATTEMPTS = 5;
+    private static final long LOCK_DURATION_MS = 15 * 60 * 1000;
+
+    private ConcurrentHashMap<String, Integer> loginFailCount = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Long> accountLockTime = new ConcurrentHashMap<>();
 
     /**
      * 构造方法 —— 初始化DAO对象
@@ -107,19 +114,35 @@ public class LoginController extends BaseController implements HttpHandler {
 
         username = username.trim();
 
-        /* 根据用户名查询管理员账号 */
+        Long lockTime = accountLockTime.get(username);
+        if (lockTime != null) {
+            long remainingLock = lockTime - System.currentTimeMillis();
+            if (remainingLock > 0) {
+                long remainingMinutes = remainingLock / 60000 + 1;
+                sendError(exchange, 429, "账户已被锁定，请" + remainingMinutes + "分钟后再试");
+                return;
+            } else {
+                accountLockTime.remove(username);
+                loginFailCount.remove(username);
+            }
+        }
+
         Admin admin = adminDao.findByUsername(username);
         if (admin == null) {
+            recordLoginFailure(username);
             sendError(exchange, 401, "用户名或密码错误");
             return;
         }
 
-        /* 使用SHA-256加密后比对新密码 */
         boolean passwordValid = PasswordUtil.verify(password, admin.getPassword());
         if (!passwordValid) {
+            recordLoginFailure(username);
             sendError(exchange, 401, "用户名或密码错误");
             return;
         }
+
+        loginFailCount.remove(username);
+        accountLockTime.remove(username);
 
         /* 生成唯一的会话令牌 */
         String token = UUID.randomUUID().toString().replace("-", "");
@@ -263,5 +286,21 @@ public class LoginController extends BaseController implements HttpHandler {
         }
 
         return null;
+    }
+
+    private void recordLoginFailure(String username) {
+        int count = loginFailCount.getOrDefault(username, 0) + 1;
+        loginFailCount.put(username, count);
+
+        if (count >= MAX_LOGIN_ATTEMPTS) {
+            accountLockTime.put(username, System.currentTimeMillis() + LOCK_DURATION_MS);
+            SystemLog errorLog = new SystemLog();
+            errorLog.setOperatorName(username);
+            errorLog.setOperationType("错误");
+            errorLog.setOperationContent("账户 [" + username + "] 因连续" + MAX_LOGIN_ATTEMPTS + "次登录失败已被锁定15分钟");
+            errorLog.setCreateTime(DateUtil.getCurrentDateTime());
+            systemLogDao.insert(errorLog);
+            System.err.println("安全警告：账户 [" + username + "] 已被锁定15分钟（连续" + MAX_LOGIN_ATTEMPTS + "次登录失败）");
+        }
     }
 }

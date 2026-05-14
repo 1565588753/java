@@ -8,10 +8,13 @@ import com.internetcafe.entity.ConsumeRecord;
 import com.internetcafe.entity.OnlineRecord;
 import com.internetcafe.entity.User;
 import com.internetcafe.entity.VipLevel;
+import com.internetcafe.util.DBUtil;
 import com.internetcafe.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Connection;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -42,6 +45,18 @@ public class ChargeService {
      * 所有计费以此为基础，再根据会员等级折扣进行计算
      */
     public static final BigDecimal NORMAL_PRICE_PER_HOUR = new BigDecimal("5.00");
+
+    /**
+     * 高峰时段每小时单价（元）
+     * 每日 18:00 - 24:00 为高峰时段，采用较高费率
+     */
+    public static final BigDecimal PEAK_PRICE_PER_HOUR = new BigDecimal("8.00");
+
+    /**
+     * 深夜时段每小时单价（元）
+     * 每日 00:00 - 08:00 为深夜时段，采用优惠费率
+     */
+    public static final BigDecimal NIGHT_PRICE_PER_HOUR = new BigDecimal("3.00");
 
     /**
      * 定时器扫描间隔（毫秒）
@@ -146,93 +161,103 @@ public class ChargeService {
      *                          "余额扣款失败" - 更新用户余额失败
      */
     public BigDecimal stopOnline(Integer recordId) {
-        /* 第一步：获取上机记录 */
         OnlineRecord record = onlineRecordDao.findById(recordId);
         if (record == null) {
             throw new RuntimeException("上机记录不存在");
         }
 
-        /* 第二步：计算上机时长（分钟），使用DateUtil工具类计算时间差 */
         String now = DateUtil.getCurrentDateTime();
         long durationMinutes = DateUtil.getMinutesBetween(record.getLoginTime(), now);
-        /* 最少按1分钟计费，避免0分钟的情况 */
         if (durationMinutes < 1) {
             durationMinutes = 1;
         }
 
-        /* 第三步：根据用户会员等级计算本次费用 */
         BigDecimal cost = calculateFee(record.getUserId(), durationMinutes);
 
-        /* 第四步：检查用户余额是否足够支付 */
         User user = userDao.findById(record.getUserId());
         if (user != null) {
             BigDecimal balance = user.getBalance();
             if (balance == null || balance.compareTo(cost) < 0) {
-                /* 余额不足时，按实际余额扣费（最多扣到0） */
                 cost = balance != null ? balance : BigDecimal.ZERO;
             }
         }
 
-        /* 第五步：更新上机记录为已下机状态 */
-        boolean updateResult = onlineRecordDao.stopOnline(recordId, now, durationMinutes, cost);
-        if (!updateResult) {
-            throw new RuntimeException("上机记录结算失败");
-        }
-
-        /* 第六步：从用户余额中扣除本次消费金额 */
-        if (user != null) {
-            BigDecimal newBalance = user.getBalance().subtract(cost);
-            if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-                newBalance = BigDecimal.ZERO;
+        Connection conn = null;
+        try {
+            conn = DBUtil.getConnection();
+            if (conn == null) {
+                throw new RuntimeException("无法获取数据库连接");
             }
-            int result = userDao.updateBalance(record.getUserId(), newBalance);
-            if (result <= 0) {
-                throw new RuntimeException("余额扣款失败");
+            DBUtil.beginTransaction(conn);
+
+            boolean updateResult = onlineRecordDao.stopOnline(recordId, now, durationMinutes, cost);
+            if (!updateResult) {
+                DBUtil.rollbackTransaction(conn);
+                throw new RuntimeException("上机记录结算失败");
             }
-        }
 
-        /* 第七步：创建消费记录 */
-        ConsumeRecord consumeRecord = new ConsumeRecord();
-        consumeRecord.setUserId(record.getUserId());
-        consumeRecord.setAmount(cost);
-        consumeRecord.setConsumeType("上机消费");
-        consumeRecord.setCreateTime(now);
-        consumeRecordDao.insert(consumeRecord);
-
-        /* 第八步：为用户增加积分（每消费1元获得1积分） */
-        if (user != null && cost.compareTo(BigDecimal.ZERO) > 0) {
-            int earnedPoints = cost.setScale(0, RoundingMode.DOWN).intValue();
-            if (earnedPoints > 0) {
-                int newPoints = (user.getPoints() != null ? user.getPoints() : 0) + earnedPoints;
-                userDao.updatePoints(record.getUserId(), newPoints);
+            if (user != null) {
+                BigDecimal newBalance = user.getBalance().subtract(cost);
+                if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+                    newBalance = BigDecimal.ZERO;
+                }
+                int result = userDao.updateBalance(record.getUserId(), newBalance);
+                if (result <= 0) {
+                    DBUtil.rollbackTransaction(conn);
+                    throw new RuntimeException("余额扣款失败");
+                }
             }
-        }
 
-        return cost;
+            ConsumeRecord consumeRecord = new ConsumeRecord();
+            consumeRecord.setUserId(record.getUserId());
+            consumeRecord.setAmount(cost);
+            consumeRecord.setConsumeType("上机消费");
+            consumeRecord.setCreateTime(now);
+            consumeRecordDao.insert(consumeRecord);
+
+            if (user != null && cost.compareTo(BigDecimal.ZERO) > 0) {
+                int earnedPoints = cost.setScale(0, RoundingMode.DOWN).intValue();
+                if (earnedPoints > 0) {
+                    int newPoints = (user.getPoints() != null ? user.getPoints() : 0) + earnedPoints;
+                    userDao.updatePoints(record.getUserId(), newPoints);
+                }
+            }
+
+            DBUtil.commitTransaction(conn);
+            return cost;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            DBUtil.rollbackTransaction(conn);
+            throw new RuntimeException("结算异常：" + e.getMessage());
+        } finally {
+            DBUtil.closeAll(conn, null);
+        }
     }
 
     /**
-     * 计算上机费用
-     * 根据用户所属的会员等级获取对应的折扣率，然后计算实际费用。
-     * 计算公式：标准单价（5元/小时） × 上机时长（小时） × 会员折扣率
-     * 使用 BigDecimal 保证金额计算精度，结果四舍五入保留两位小数。
+     * 计算上机费用（含时段费率 + 会员折扣 + 积分折扣）
+     *
+     * 计费规则：
+     * 1. 根据当前时间确定基础单价（深夜/普通/高峰）
+     * 2. 应用会员等级折扣率
+     * 3. 应用积分兑换的额外折扣
      *
      * @param userId          用户ID
      * @param durationMinutes 上机时长（分钟）
      * @return 计算后的实际费用（元），保留两位小数
      */
     public BigDecimal calculateFee(Integer userId, Long durationMinutes) {
-        /* 获取用户信息，确定会员等级 */
         User user = userDao.findById(userId);
         if (user == null) {
-            /* 用户不存在时按标准价格计算 */
             return calculateNormalFee(durationMinutes);
         }
 
-        /* 获取用户的会员等级信息 */
+        BigDecimal basePricePerHour = getCurrentTimePrice();
+
         Integer vipLevelId = user.getVipLevel();
         VipLevel vipLevel = null;
-        BigDecimal discountRate = new BigDecimal("1.00"); /* 默认不打折 */
+        BigDecimal discountRate = new BigDecimal("1.00");
 
         if (vipLevelId != null) {
             vipLevel = vipLevelDao.findById(vipLevelId);
@@ -242,17 +267,44 @@ public class ChargeService {
             discountRate = vipLevel.getDiscountRate();
         }
 
-        /* 将分钟转换为小时（使用BigDecimal保证精度） */
+        BigDecimal pointsDiscount = BigDecimal.ZERO;
+        if (user.getPoints() != null && user.getPoints() > 0) {
+            pointsDiscount = new VipService().getPointsDiscount(user.getPoints());
+        }
+
+        BigDecimal effectiveDiscount = discountRate.subtract(pointsDiscount);
+        if (effectiveDiscount.compareTo(new BigDecimal("0.50")) < 0) {
+            effectiveDiscount = new BigDecimal("0.50");
+        }
+
         BigDecimal hours = new BigDecimal(durationMinutes)
                 .divide(new BigDecimal("60"), 4, RoundingMode.HALF_UP);
 
-        /* 计算费用：标准单价 × 小时数 × 折扣率 */
-        BigDecimal fee = NORMAL_PRICE_PER_HOUR
+        BigDecimal fee = basePricePerHour
                 .multiply(hours)
-                .multiply(discountRate)
+                .multiply(effectiveDiscount)
                 .setScale(2, RoundingMode.HALF_UP);
 
         return fee;
+    }
+
+    /**
+     * 根据当前时间获取对应时段的基础单价
+     * 深夜时段 00:00-08:00 → 3元/小时
+     * 普通时段 08:00-18:00 → 5元/小时
+     * 高峰时段 18:00-24:00 → 8元/小时
+     */
+    private BigDecimal getCurrentTimePrice() {
+        Calendar cal = Calendar.getInstance();
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+        if (hour >= 0 && hour < 8) {
+            return NIGHT_PRICE_PER_HOUR;
+        } else if (hour >= 18 && hour < 24) {
+            return PEAK_PRICE_PER_HOUR;
+        } else {
+            return NORMAL_PRICE_PER_HOUR;
+        }
     }
 
     /**
@@ -324,28 +376,59 @@ public class ChargeService {
      * 例如每秒钟检查一次，确保余额不足的用户能被及时断网。
      */
     public void autoStopLowBalance() {
-        /* 获取所有当前正在上机的记录 */
         List<OnlineRecord> activeRecords = getActiveRecords();
 
         for (OnlineRecord record : activeRecords) {
             try {
-                /* 获取用户信息并检查余额 */
                 User user = userDao.findById(record.getUserId());
                 if (user == null) {
                     continue;
                 }
 
-                /* 如果用户余额小于等于0，自动执行下机结算 */
                 if (user.getBalance() == null || user.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
                     stopOnline(record.getId());
                     System.out.println("自动下机：用户ID=" + record.getUserId()
                             + "，上机记录ID=" + record.getId() + "，原因：余额不足");
                 }
             } catch (Exception e) {
-                /* 单条记录处理失败不影响其他记录的检查 */
                 System.err.println("自动检查余额时发生异常，上机记录ID=" + record.getId()
                         + "：" + e.getMessage());
             }
         }
+    }
+
+    /**
+     * 断点续计 —— 系统异常重启后恢复异常中断的上机记录
+     *
+     * 恢复策略：
+     * 1. 查找所有状态为1（上机中）或3（异常下机）的记录
+     * 2. 对于异常下机的记录，自动执行结算操作
+     * 3. 对于仍在"上机中"的记录，保持状态不变继续计费
+     *
+     * @return 恢复的上机记录数量
+     */
+    public int recoverInterruptedSessions() {
+        int recoveredCount = 0;
+        List<OnlineRecord> interruptedRecords = onlineRecordDao.findByStatus(3);
+
+        for (OnlineRecord record : interruptedRecords) {
+            try {
+                stopOnline(record.getId());
+                recoveredCount++;
+                System.out.println("断点续计：已结算异常下机记录，记录ID=" + record.getId()
+                        + "，用户ID=" + record.getUserId());
+            } catch (Exception e) {
+                System.err.println("断点续计失败：记录ID=" + record.getId()
+                        + "，" + e.getMessage());
+            }
+        }
+
+        List<OnlineRecord> activeRecords = onlineRecordDao.findByStatus(1);
+        if (activeRecords != null && !activeRecords.isEmpty()) {
+            System.out.println("发现 " + activeRecords.size() + " 条活跃上机记录，将恢复计费监控");
+            recoveredCount += activeRecords.size();
+        }
+
+        return recoveredCount;
     }
 }

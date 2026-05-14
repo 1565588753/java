@@ -207,6 +207,14 @@ body {
   border-left-color: #4A90D9;
 }
 
+.nav-item.role-hidden {
+  display: none;
+}
+
+.role-admin-only.hidden {
+  display: none !important;
+}
+
 .nav-item .nav-icon {
   font-size: 18px;
   width: 24px;
@@ -621,12 +629,16 @@ table tbody tr:hover {
     <div class="sidebar-header">
       <h2>🏪 网吧计费系统</h2>
     </div>
+    <div class="user-info" id="sidebar-user-info">
+      <div class="avatar">👤</div>
+      <div>
+        <div class="name" id="sidebar-username">管理员</div>
+        <div class="role" id="sidebar-role">管理员</div>
+      </div>
+    </div>
     <nav class="sidebar-nav">
       <div class="nav-item active" data-panel="dashboard" onclick="switchPanel('dashboard', this)">
         <span class="nav-icon">📊</span><span>首页仪表盘</span>
-      </div>
-      <div class="nav-item" data-panel="users" onclick="switchPanel('users', this)">
-        <span class="nav-icon">👥</span><span>用户管理</span>
       </div>
       <div class="nav-item" data-panel="online" onclick="switchPanel('online', this)">
         <span class="nav-icon">💻</span><span>上机管理</span>
@@ -634,13 +646,16 @@ table tbody tr:hover {
       <div class="nav-item" data-panel="recharge" onclick="switchPanel('recharge', this)">
         <span class="nav-icon">💰</span><span>充值管理</span>
       </div>
+      <div class="nav-item" data-panel="users" onclick="switchPanel('users', this)">
+        <span class="nav-icon">👥</span><span>用户管理</span>
+      </div>
       <div class="nav-item" data-panel="vip" onclick="switchPanel('vip', this)">
         <span class="nav-icon">👑</span><span>会员管理</span>
       </div>
-      <div class="nav-item" data-panel="reports" onclick="switchPanel('reports', this)">
+      <div class="nav-item role-admin-only" data-panel="reports" onclick="switchPanel('reports', this)">
         <span class="nav-icon">📈</span><span>报表统计</span>
       </div>
-      <div class="nav-item" data-panel="logs" onclick="switchPanel('logs', this)">
+      <div class="nav-item role-admin-only" data-panel="logs" onclick="switchPanel('logs', this)">
         <span class="nav-icon">📋</span><span>系统日志</span>
       </div>
       <div class="nav-item logout" onclick="doLogout()">
@@ -908,13 +923,20 @@ table tbody tr:hover {
         <div class="card-title">月度营业额趋势</div>
         <div class="chart-placeholder" id="monthly-chart">月度营业额图表区域（数据加载中...）</div>
       </div>
+      <div class="card">
+        <div class="card-title">会员增长趋势（本年）</div>
+        <div class="chart-placeholder" id="growth-chart">会员增长数据加载中...</div>
+      </div>
     </div>
 
     <!-- Logs Panel -->
     <div class="panel" id="panel-logs">
       <div class="panel-header">
         <h2>系统日志</h2>
-        <button class="btn btn-danger btn-sm" onclick="cleanLogs()">清空日志</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="exportLogs()">📥 导出日志</button>
+          <button class="btn btn-danger btn-sm" onclick="cleanLogs()">清空日志</button>
+        </div>
       </div>
       <div class="card">
         <div class="toolbar">
@@ -1103,6 +1125,7 @@ async function doLogin() {
     sessionToken = data.token;
     document.getElementById('login-overlay').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
+    applyRoleBasedUI();
     showToast('登录成功，欢迎回来！', 'success');
     switchPanel('dashboard', document.querySelector('.nav-item[data-panel="dashboard"]'));
   } catch (e) {
@@ -1127,6 +1150,25 @@ async function doLogout() {
   document.getElementById('login-username').value = '';
   document.getElementById('login-password').value = '';
   document.getElementById('login-error').textContent = '';
+}
+
+function applyRoleBasedUI() {
+  if (!currentUser) return;
+
+  var isAdmin = currentUser.role === 'admin';
+  var sidebarUsername = document.getElementById('sidebar-username');
+  var sidebarRole = document.getElementById('sidebar-role');
+  if (sidebarUsername) sidebarUsername.textContent = currentUser.username || '管理员';
+  if (sidebarRole) sidebarRole.textContent = isAdmin ? '管理员' : '操作员';
+
+  var adminElements = document.querySelectorAll('.role-admin-only');
+  adminElements.forEach(function(el) {
+    if (isAdmin) {
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
 }
 
 function switchPanel(panelName, el) {
@@ -1652,6 +1694,7 @@ async function loadReports() {
     var summary = await apiFetch('/api/report/summary');
     var ranking = await apiFetch('/api/report/ranking');
     var monthly = await apiFetch('/api/report/monthly');
+    var growth = await apiFetch('/api/report/growth');
 
     var s = summary.data || summary || {};
     document.getElementById('rpt-today-income').textContent = '¥' + (s.todayRevenue || 0).toFixed(2);
@@ -1695,6 +1738,31 @@ async function loadReports() {
     } else {
       chartEl.innerHTML = '暂无月度数据';
     }
+
+    var growthResult = growth.data || growth || {};
+    var growthData = growthResult.growthTrend || growthResult || [];
+    if (!Array.isArray(growthData)) growthData = growthData.records || growthData.list || [];
+    var growthEl = document.getElementById('growth-chart');
+    if (growthData.length > 0) {
+      var maxGrowth = 0;
+      growthData.forEach(function(m) { if ((m.newUsers || 0) > maxGrowth) maxGrowth = m.newUsers || 0; });
+      var chartHtml = '<div style="display:flex;align-items:flex-end;gap:8px;height:180px;padding:10px;justify-content:center">';
+      growthData.forEach(function(m) {
+        var v = m.newUsers || 0;
+        var h = maxGrowth > 0 ? (v / maxGrowth * 160) : 0;
+        chartHtml += '<div style="display:flex;flex-direction:column;align-items:center;gap:4px">';
+        chartHtml += '<span style="font-size:11px;color:#777">' + v + '人</span>';
+        chartHtml += '<div style="width:36px;height:' + h + 'px;background:linear-gradient(to top,#27ae60,#2ecc71);border-radius:4px 4px 0 0"></div>';
+        chartHtml += '<span style="font-size:11px;color:#999">' + m.month + '月</span>';
+        chartHtml += '</div>';
+      });
+      chartHtml += '</div>';
+      growthEl.innerHTML = chartHtml;
+      growthEl.style.background = '#fff';
+      growthEl.style.border = 'none';
+    } else {
+      growthEl.innerHTML = '暂无会员增长数据';
+    }
   } catch (e) {
     showToast('加载报表失败: ' + e.message, 'error');
   } finally {
@@ -1703,7 +1771,43 @@ async function loadReports() {
 }
 
 function exportReport() {
-  showToast('报表导出功能开发中，敬请期待', 'info');
+  try {
+    var todayIncome = document.getElementById('rpt-today-income').textContent.replace('¥', '');
+    var monthIncome = document.getElementById('rpt-month-income').textContent.replace('¥', '');
+    var todayRecharge = document.getElementById('rpt-today-recharge').textContent.replace('¥', '');
+    var todaySessions = document.getElementById('rpt-today-sessions').textContent;
+
+    var csvContent = '\uFEFF';
+    csvContent += '指标,数值\n';
+    csvContent += '今日营业额,' + todayIncome + '\n';
+    csvContent += '本月营业额,' + monthIncome + '\n';
+    csvContent += '今日充值,' + todayRecharge + '\n';
+    csvContent += '今日上机次数,' + todaySessions + '\n';
+
+    var rankList = document.querySelectorAll('#report-ranking li');
+    if (rankList.length > 0) {
+      csvContent += '\n用户消费排行\n';
+      csvContent += '排名,用户名,消费金额\n';
+      rankList.forEach(function(li, i) {
+        var name = (li.querySelector('.rank-name') || {}).textContent || '';
+        var amount = (li.querySelector('.rank-value') || {}).textContent || '';
+        csvContent += (i + 1) + ',' + name + ',' + amount + '\n';
+      });
+    }
+
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '网吧经营报表_' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('报表导出成功', 'success');
+  } catch (e) {
+    showToast('导出失败: ' + e.message, 'error');
+  }
 }
 
 // Logs
@@ -1757,6 +1861,42 @@ async function loadLogs(page) {
   }
 }
 
+async function exportLogs() {
+  showLoading();
+  try {
+    var type = document.getElementById('log-type-filter').value;
+    var date = document.getElementById('log-date-filter').value;
+    var params = '?pageSize=9999';
+    if (type) params += '&type=' + encodeURIComponent(type);
+    if (date) params += '&date=' + encodeURIComponent(date);
+
+    var data = await apiFetch('/api/logs' + params);
+    var list = data.data || data;
+    var rows = Array.isArray(list) ? list : (list.records || list.list || []);
+
+    var csvContent = '\uFEFF';
+    csvContent += 'ID,操作人,操作类型,描述,时间\n';
+    rows.forEach(function(log) {
+      csvContent += (log.id || '') + ',' + (log.operatorName || '') + ',' + (log.operationType || '') + ',' + (log.operationContent || '') + ',' + (log.createTime || '') + '\n';
+    });
+
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '系统日志_' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('日志导出成功', 'success');
+  } catch (e) {
+    showToast('日志导出失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
 async function cleanLogs() {
   var date = prompt('请输入要清理的日期（格式：YYYY-MM-DD），留空则清空所有日志：');
   if (date === null) return;
@@ -1802,6 +1942,7 @@ document.getElementById('vip-level-modal').addEventListener('click', function(e)
       currentUser = data.admin;
       document.getElementById('login-overlay').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
+      applyRoleBasedUI();
       switchPanel('dashboard', document.querySelector('.nav-item[data-panel="dashboard"]'));
     }
   } catch (e) {

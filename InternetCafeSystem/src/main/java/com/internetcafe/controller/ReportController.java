@@ -75,6 +75,12 @@ public class ReportController extends BaseController implements HttpHandler {
                 return;
             }
 
+            /* GET /api/report/growth —— 获取会员增长趋势 */
+            if ("GET".equals(method) && "/api/report/growth".equals(path)) {
+                handleGrowth(exchange);
+                return;
+            }
+
             sendError(exchange, 404, "接口不存在: " + method + " " + path);
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,6 +172,24 @@ public class ReportController extends BaseController implements HttpHandler {
         Map<String, Object> response = new HashMap<>();
         response.put("year", year);
         response.put("monthlyStats", monthlyStats);
+
+        sendJson(exchange, response);
+    }
+
+    private void handleGrowth(HttpExchange exchange) throws IOException {
+        int year = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+        String yearStr = getQueryParam(exchange, "year");
+        if (yearStr != null && !yearStr.isEmpty()) {
+            try {
+                year = Integer.parseInt(yearStr);
+            } catch (NumberFormatException e) {}
+        }
+
+        List<Map<String, Object>> growthTrend = reportService.getMemberGrowthTrend(year);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("year", year);
+        response.put("growthTrend", growthTrend);
 
         sendJson(exchange, response);
     }

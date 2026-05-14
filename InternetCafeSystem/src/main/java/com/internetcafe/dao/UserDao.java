@@ -452,4 +452,27 @@ public class UserDao {
         user.setCreateTime(rs.getString("create_time"));
         return user;
     }
+
+    public int getNewUsersByDateRange(String startDate, String endDate) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = DBUtil.getConnection();
+            String sql = "SELECT COUNT(*) FROM user WHERE create_time >= ? AND create_time <= ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, startDate + " 00:00:00");
+            pstmt.setString(2, endDate + " 23:59:59");
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        } catch (SQLException e) {
+            System.err.println("查询新增用户数时发生异常: " + e.getMessage());
+            return 0;
+        } finally {
+            DBUtil.closeAll(conn, pstmt, rs);
+        }
+    }
 }

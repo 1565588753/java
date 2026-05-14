@@ -6,6 +6,7 @@ import com.internetcafe.controller.LoginController;
 import com.internetcafe.controller.ReportController;
 import com.internetcafe.controller.UserController;
 import com.internetcafe.controller.VipController;
+import com.internetcafe.service.ChargeService;
 import com.internetcafe.util.DBUtil;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -21,6 +22,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 
 /**
@@ -153,6 +156,41 @@ public class WebServer {
             System.out.println("  访问地址：http://localhost:" + PORT + "/");
             System.out.println("  API接口：http://localhost:" + PORT + "/api/");
             System.out.println("============================================");
+
+            ChargeService chargeService = new ChargeService();
+            int recovered = chargeService.recoverInterruptedSessions();
+            if (recovered > 0) {
+                System.out.println("断点续计：已恢复 " + recovered + " 条上机记录");
+            }
+
+            Timer autoStopTimer = new Timer("AutoStopBalanceTimer", true);
+            autoStopTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        chargeService.autoStopLowBalance();
+                    } catch (Exception e) {
+                        System.err.println("自动余额检查异常：" + e.getMessage());
+                    }
+                }
+            }, 5000, ChargeService.TIMER_INTERVAL);
+            System.out.println("余额自动监控已启动（扫描间隔：" + ChargeService.TIMER_INTERVAL + "ms）");
+
+            Timer backupTimer = new Timer("DatabaseBackupTimer", true);
+            backupTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        String backupFile = DBUtil.backupDatabase();
+                        if (backupFile != null) {
+                            System.out.println("数据库自动备份完成：" + backupFile);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("数据库自动备份异常：" + e.getMessage());
+                    }
+                }
+            }, 60000, 3600000);
+            System.out.println("数据库自动备份已启动（间隔：1小时）");
 
             /* 注册JVM关闭钩子 —— 确保程序退出时释放数据库连接池资源 */
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {

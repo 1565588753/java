@@ -1,5 +1,6 @@
 package com.internetcafe.service;
 
+import java.util.concurrent.ConcurrentHashMap;
 import com.internetcafe.dao.AdminDao;
 import com.internetcafe.dao.SystemLogDao;
 import com.internetcafe.entity.Admin;
@@ -26,6 +27,11 @@ public class LoginService {
     /** 当前已登录的管理员对象，未登录时为null */
     private Admin currentAdmin;
 
+    private static final int MAX_LOGIN_ATTEMPTS = 5;
+    private static final long LOCK_DURATION_MS = 15 * 60 * 1000;
+    private ConcurrentHashMap<String, Integer> loginFailCount = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Long> accountLockTime = new ConcurrentHashMap<>();
+
     /**
      * 构造方法
      * 初始化DAO对象，当前管理员状态默认为null（未登录状态）
@@ -51,17 +57,37 @@ public class LoginService {
             return false;
         }
 
-        Admin admin = adminDao.findByUsername(username.trim());
+        username = username.trim();
+
+        Long lockTime = accountLockTime.get(username);
+        if (lockTime != null) {
+            long remainingLock = lockTime - System.currentTimeMillis();
+            if (remainingLock > 0) {
+                long remainingMinutes = remainingLock / 60000 + 1;
+                System.err.println("账户 [" + username + "] 已被锁定，剩余时间：" + remainingMinutes + "分钟");
+                return false;
+            } else {
+                accountLockTime.remove(username);
+                loginFailCount.remove(username);
+            }
+        }
+
+        Admin admin = adminDao.findByUsername(username);
         if (admin == null) {
             System.err.println("登录失败：用户名 [" + username + "] 不存在");
+            recordLoginFailure(username);
             return false;
         }
 
         boolean passwordValid = PasswordUtil.verify(password, admin.getPassword());
         if (!passwordValid) {
             System.err.println("登录失败：用户 [" + username + "] 密码错误");
+            recordLoginFailure(username);
             return false;
         }
+
+        loginFailCount.remove(username);
+        accountLockTime.remove(username);
 
         this.currentAdmin = admin;
 
@@ -111,6 +137,22 @@ public class LoginService {
      */
     public boolean isLoggedIn() {
         return currentAdmin != null;
+    }
+
+    private void recordLoginFailure(String username) {
+        int count = loginFailCount.getOrDefault(username, 0) + 1;
+        loginFailCount.put(username, count);
+
+        if (count >= MAX_LOGIN_ATTEMPTS) {
+            accountLockTime.put(username, System.currentTimeMillis() + LOCK_DURATION_MS);
+            SystemLog errorLog = new SystemLog();
+            errorLog.setOperatorName(username);
+            errorLog.setOperationType("错误");
+            errorLog.setOperationContent("账户 [" + username + "] 因连续" + MAX_LOGIN_ATTEMPTS + "次登录失败已被锁定15分钟");
+            errorLog.setCreateTime(DateUtil.getCurrentDateTime());
+            systemLogDao.insert(errorLog);
+            System.err.println("安全警告：账户 [" + username + "] 已被锁定15分钟（连续" + MAX_LOGIN_ATTEMPTS + "次登录失败）");
+        }
     }
 
     /**
