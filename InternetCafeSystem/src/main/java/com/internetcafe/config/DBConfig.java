@@ -89,7 +89,7 @@ public class DBConfig {
         }
 
         // 从配置文件中读取各属性值，若未配置则使用默认值
-        url = props.getProperty("db.url", "jdbc:mysql://localhost:3306/internet_cafe?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf-8");
+        url = props.getProperty("db.url", "jdbc:mysql://localhost:3306/internet_cafe?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8");
         username = props.getProperty("db.username", "root");
         password = props.getProperty("db.password", "root");
         driver = props.getProperty("db.driver", "com.mysql.cj.jdbc.Driver");
