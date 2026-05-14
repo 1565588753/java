@@ -1020,6 +1020,8 @@ table tbody tr:hover {
 <script>
 var API_BASE = '';
 var currentUser = null;
+var sessionToken = null;
+var loggingOut = false;
 var currentPanel = 'dashboard';
 
 function showLoading() {
@@ -1048,11 +1050,16 @@ async function apiFetch(url, options) {
   options = options || {};
   options.headers = options.headers || {};
   options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
+  if (sessionToken) {
+    options.headers['Authorization'] = 'Bearer ' + sessionToken;
+  }
   try {
     var resp = await fetch(API_BASE + url, options);
     if (resp.status === 401) {
-      showToast('登录已过期，请重新登录', 'error');
-      doLogout();
+      if (!loggingOut) {
+        showToast('登录已过期，请重新登录', 'error');
+        doLogout();
+      }
       throw new Error('Unauthorized');
     }
     var data = await resp.json();
@@ -1089,7 +1096,8 @@ async function doLogin() {
       method: 'POST',
       body: JSON.stringify({ username: username, password: password })
     });
-    currentUser = data.data || data.user || { username: username };
+    currentUser = data.admin || data.data || data.user || { username: username };
+    sessionToken = data.token;
     document.getElementById('login-overlay').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     showToast('登录成功，欢迎回来！', 'success');
@@ -1103,9 +1111,12 @@ async function doLogin() {
 }
 
 async function doLogout() {
+  loggingOut = true;
   try {
     await apiFetch('/api/logout', { method: 'POST' });
   } catch (e) {}
+  loggingOut = false;
+  sessionToken = null;
   currentUser = null;
   document.getElementById('login-overlay').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
@@ -1783,8 +1794,8 @@ document.getElementById('vip-level-modal').addEventListener('click', function(e)
 (async function() {
   try {
     var data = await apiFetch('/api/session');
-    if (data && (data.data || data.user || data.username)) {
-      currentUser = data.data || data.user || data;
+    if (data && data.loggedIn && data.admin) {
+      currentUser = data.admin;
       document.getElementById('login-overlay').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
       switchPanel('dashboard', document.querySelector('.nav-item[data-panel="dashboard"]'));
