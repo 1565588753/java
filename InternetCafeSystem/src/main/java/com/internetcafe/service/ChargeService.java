@@ -114,6 +114,8 @@ public class ChargeService {
         record.setUserId(userId);
         record.setMachineNo(machineNo);
         record.setLoginTime(DateUtil.getCurrentDateTime());
+        record.setDuration(0L);      /* 初始时长为0 */
+        record.setCost(BigDecimal.ZERO);  /* 初始消费为0 */
         record.setStatus(1); /* 状态：1=上机中 */
 
         Integer recordId = onlineRecordDao.insert(record);
