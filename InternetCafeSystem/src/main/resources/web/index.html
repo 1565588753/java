@@ -243,6 +243,12 @@ body {
   margin-left: 220px;
   padding: 24px;
   min-height: 100vh;
+  max-width: 1400px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .panel {
@@ -273,7 +279,7 @@ body {
 
 .stat-cards {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -308,6 +314,7 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   padding: 20px;
   margin-bottom: 20px;
+  overflow-x: auto;
 }
 
 .card-title {
@@ -340,7 +347,7 @@ body {
 }
 
 table {
-  width: 100%;
+  min-width: 100%;
   border-collapse: collapse;
 }
 
@@ -398,8 +405,9 @@ table tbody tr:hover {
 
 .form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
+  max-width: 900px;
 }
 
 .form-actions {
@@ -594,9 +602,9 @@ table tbody tr:hover {
   font-size: 14px;
 }
 
-@media (max-width: 1200px) {
-  .stat-cards {
-    grid-template-columns: repeat(3, 1fr);
+@media (max-width: 1024px) {
+  .stat-card .stat-value {
+    font-size: 22px;
   }
 }
 
@@ -605,14 +613,41 @@ table tbody tr:hover {
     width: 60px;
   }
   .sidebar-header h2,
+  .sidebar-header .sidebar-subtitle,
   .nav-item span:not(.nav-icon) {
     display: none;
   }
+  .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+  }
   .content {
     margin-left: 60px;
+    padding: 16px;
   }
   .stat-cards {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-cards {
+    grid-template-columns: 1fr;
+  }
+  .content {
+    padding: 12px;
   }
 }
 </style>
