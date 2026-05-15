@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>网吧计费管理系统</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: #f0f2f5;
+  color: #333;
+  min-height: 100vh;
+}
+
+#app {
+  display: none;
+  height: 100vh;
+}
+
+#login-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 48px 40px;
+  width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.login-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2C3E50;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #4A90D9;
+  box-shadow: 0 0 0 2px rgba(74,144,217,0.2);
+}
+
+.login-error {
+  color: #E74C3C;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 16px;
+  min-height: 20px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 6px;
+}
+
+.btn-primary {
+  background: #4A90D9;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #357ABD;
+}
+
+.btn-success {
+  background: #27AE60;
+  color: #fff;
+}
+
+.btn-success:hover {
+  background: #219A52;
+}
+
+.btn-danger {
+  background: #E74C3C;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #C0392B;
+}
+
+.btn-default {
+  background: #f0f0f0;
+  color: #555;
+}
+
+.btn-default:hover {
+  background: #e0e0e0;
+}
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sidebar {
+  width: 220px;
+  background: #2C3E50;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  gap: 10px;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.nav-item.active {
+  background: rgba(74,144,217,0.2);
+  color: #4A90D9;
+  border-left-color: #4A90D9;
+}
+
+.nav-item.role-hidden {
+  display: none;
+}
+
+.role-admin-only.hidden {
+  display: none !important;
+}
+
+.admin-only.hidden {
+  display: none !important;
+}
+
+.user-only {
+  display: none;
+}
+
+.user-only.visible {
+  display: flex;
+}
+
+.nav-item .nav-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.nav-item.logout {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-top: auto;
+  color: #E74C3C;
+}
+
+.content {
+  margin-left: 220px;
+  padding: 24px;
+  min-height: 100vh;
+  max-width: 1400px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.panel-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+.panel-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.stat-card .stat-label {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2C3E50;
+}
+
+.stat-card.primary .stat-value { color: #4A90D9; }
+.stat-card.success .stat-value { color: #27AE60; }
+.stat-card.warning .stat-value { color: #F39C12; }
+.stat-card.danger .stat-value { color: #E74C3C; }
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  padding: 20px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 16px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 8px 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  width: 240px;
+}
+
+.search-input:focus {
+  border-color: #4A90D9;
+  box-shadow: 0 0 0 2px rgba(74,144,217,0.2);
+}
+
+table {
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+
+table th {
+  background: #fafafa;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap;
+}
+
+table tbody tr:hover {
+  background: #f5f9ff;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+}
+
+.pagination button:hover:not(:disabled) {
+  border-color: #4A90D9;
+  color: #4A90D9;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination .page-info {
+  font-size: 13px;
+  color: #777;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  max-width: 900px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px;
+  width: 520px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+}
+
+.modal h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2C3E50;
+  margin-bottom: 20px;
+}
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: slideIn 0.3s ease;
+  max-width: 360px;
+}
+
+.toast.success { background: #27AE60; }
+.toast.error { background: #E74C3C; }
+.toast.info { background: #4A90D9; }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.loading-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0.7);
+  z-index: 9998;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-overlay.show {
+  display: flex;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #4A90D9;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.chart-placeholder {
+  background: #fafafa;
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
+
+.rank-list {
+  list-style: none;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 12px;
+}
+
+.rank-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #bbb;
+}
+
+.rank-num.top1 { background: #F39C12; }
+.rank-num.top2 { background: #95A5A6; }
+.rank-num.top3 { background: #E67E22; }
+
+.rank-name {
+  flex: 1;
+  font-size: 14px;
+}
+
+.rank-value {
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+.vip-level-card {
+  border: 2px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.vip-level-card:hover {
+  border-color: #4A90D9;
+}
+
+.vip-level-card .vip-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2C3E50;
+  margin-bottom: 4px;
+}
+
+.vip-level-card .vip-discount {
+  font-size: 24px;
+  font-weight: 700;
+  color: #4A90D9;
+}
+
+.vip-level-card .vip-info {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.timer {
+  font-weight: 600;
+  color: #4A90D9;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 14px;
+}
+
+@media (max-width: 1024px) {
+  .stat-card .stat-value {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+  .sidebar-header h2,
+  .sidebar-header .sidebar-subtitle,
+  .nav-item span:not(.nav-icon) {
+    display: none;
+  }
+  .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+  }
+  .content {
+    margin-left: 60px;
+    padding: 16px;
+  }
+  .stat-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-cards {
+    grid-template-columns: 1fr;
+  }
+  .content {
+    padding: 12px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-title">网吧计费管理系统</div>
+    <div class="login-subtitle">Internet Cafe Billing System</div>
+    <div class="form-group">
+      <label>用户名</label>
+      <input type="text" id="login-username" placeholder="请输入用户名" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <input type="password" id="login-password" placeholder="请输入密码" autocomplete="current-password">
+    </div>
+    <div class="login-error" id="login-error"></div>
+    <button class="btn btn-primary btn-block" id="login-btn" onclick="doLogin()">登 录</button>
+  </div>
+</div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>🏪 网吧计费系统</h2>
+    </div>
+    <div class="user-info" id="sidebar-user-info">
+      <div class="avatar">👤</div>
+      <div>
+        <div class="name" id="sidebar-username">管理员</div>
+        <div class="role" id="sidebar-role">管理员</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item admin-only active" data-panel="dashboard" onclick="switchPanel('dashboard', this)">
+        <span class="nav-icon">📊</span><span>首页仪表盘</span>
+      </div>
+      <div class="nav-item admin-only" data-panel="online" onclick="switchPanel('online', this)">
+        <span class="nav-icon">💻</span><span>上机管理</span>
+      </div>
+      <div class="nav-item admin-only" data-panel="recharge" onclick="switchPanel('recharge', this)">
+        <span class="nav-icon">💰</span><span>充值管理</span>
+      </div>
+      <div class="nav-item admin-only" data-panel="users" onclick="switchPanel('users', this)">
+        <span class="nav-icon">👥</span><span>用户管理</span>
+      </div>
+      <div class="nav-item admin-only" data-panel="vip" onclick="switchPanel('vip', this)">
+        <span class="nav-icon">👑</span><span>会员管理</span>
+      </div>
+      <div class="nav-item role-admin-only admin-only" data-panel="reports" onclick="switchPanel('reports', this)">
+        <span class="nav-icon">📈</span><span>报表统计</span>
+      </div>
+      <div class="nav-item role-admin-only admin-only" data-panel="logs" onclick="switchPanel('logs', this)">
+        <span class="nav-icon">📋</span><span>系统日志</span>
+      </div>
+      <div class="nav-item user-only" data-panel="user-center" onclick="switchPanel('user-center', this)">
+        <span class="nav-icon">🏠</span><span>个人中心</span>
+      </div>
+      <div class="nav-item logout" onclick="doLogout()">
+        <span class="nav-icon">🚪</span><span>退出登录</span>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="content">
+
+    <!-- Dashboard Panel -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="panel-header">
+        <h2>首页仪表盘</h2>
+      </div>
+      <div class="stat-cards" id="dashboard-stats">
+        <div class="stat-card primary">
+          <div class="stat-label">今日营业额</div>
+          <div class="stat-value" id="stat-today-income">¥0.00</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">本月营业额</div>
+          <div class="stat-value" id="stat-month-income">¥0.00</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">今日充值</div>
+          <div class="stat-value" id="stat-today-recharge">¥0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">今日上机次数</div>
+          <div class="stat-value" id="stat-today-sessions">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">用户总数</div>
+          <div class="stat-value" id="stat-total-users">0</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">用户消费排行</div>
+        <ul class="rank-list" id="dashboard-ranking"></ul>
+      </div>
+    </div>
+
+    <!-- Users Panel -->
+    <div class="panel" id="panel-users">
+      <div class="panel-header">
+        <h2>用户管理</h2>
+        <button class="btn btn-primary" onclick="openUserModal()">+ 添加用户</button>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <input type="text" class="search-input" id="user-search" placeholder="搜索用户名 / 手机号..." oninput="loadUsers(1)">
+          <button class="btn btn-default" onclick="document.getElementById('user-search').value='';loadUsers(1);">重置</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>用户名</th>
+              <th>姓名</th>
+              <th>手机号</th>
+              <th>余额</th>
+              <th>会员等级</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body"></tbody>
+        </table>
+        <div class="pagination" id="users-pagination"></div>
+      </div>
+    </div>
+
+    <!-- Online Panel -->
+    <div class="panel" id="panel-online">
+      <div class="panel-header">
+        <h2>上机管理</h2>
+      </div>
+      <div class="card">
+        <div class="card-title">开始上机</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>搜索用户</label>
+            <input type="text" class="search-input" id="online-user-search" placeholder="输入用户名或手机号搜索..." style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>机器号</label>
+            <input type="text" id="online-machine" placeholder="输入机器编号" style="width:100%">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn btn-primary" onclick="startOnline()">开始上机</button>
+        </div>
+        <div id="online-search-result" style="margin-top:8px;font-size:13px;color:#777"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">当前上机用户</div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>用户名</th>
+              <th>机器号</th>
+              <th>开始时间</th>
+              <th>已用时长</th>
+              <th>费用</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="active-sessions-table"></tbody>
+        </table>
+        <div class="empty-state" id="active-sessions-empty" style="display:none">暂无上机用户</div>
+      </div>
+      <div class="card">
+        <div class="card-title">上机历史</div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>用户名</th>
+              <th>机器号</th>
+              <th>开始时间</th>
+              <th>结束时间</th>
+              <th>时长</th>
+              <th>费用</th>
+            </tr>
+          </thead>
+          <tbody id="history-sessions-table"></tbody>
+        </table>
+        <div class="pagination" id="history-pagination"></div>
+      </div>
+    </div>
+
+    <!-- Recharge Panel -->
+    <div class="panel" id="panel-recharge">
+      <div class="panel-header">
+        <h2>充值管理</h2>
+      </div>
+      <div class="card">
+        <div class="card-title">用户充值</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>搜索用户</label>
+            <input type="text" class="search-input" id="recharge-user-search" placeholder="输入用户名或手机号搜索..." style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>充值金额</label>
+            <input type="number" id="recharge-amount" placeholder="请输入充值金额" min="1" step="0.01" style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>支付方式</label>
+            <select id="recharge-method" style="width:100%">
+              <option value="现金">现金</option>
+              <option value="微信">微信</option>
+              <option value="支付宝">支付宝</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn btn-primary" onclick="doRecharge()">确认充值</button>
+        </div>
+        <div id="recharge-user-info" style="margin-top:8px;font-size:13px;color:#777"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">充值记录</div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>用户名</th>
+              <th>金额</th>
+              <th>支付方式</th>
+              <th>充值前余额</th>
+              <th>充值后余额</th>
+              <th>时间</th>
+            </tr>
+          </thead>
+          <tbody id="recharge-records-table"></tbody>
+        </table>
+        <div class="pagination" id="recharge-pagination"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">消费记录</div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>用户名</th>
+              <th>消费金额</th>
+              <th>消费类型</th>
+              <th>时长</th>
+              <th>下机时间</th>
+            </tr>
+          </thead>
+          <tbody id="consume-records-table"></tbody>
+        </table>
+        <div class="pagination" id="consume-pagination"></div>
+      </div>
+    </div>
+
+    <!-- VIP Panel -->
+    <div class="panel" id="panel-vip">
+      <div class="panel-header">
+        <h2>会员管理</h2>
+      </div>
+      <div class="card">
+        <div class="card-title">会员等级</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px" id="vip-levels-grid"></div>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary btn-sm" onclick="openVipLevelModal()">编辑等级</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">用户升级</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>搜索用户</label>
+            <input type="text" class="search-input" id="vip-upgrade-user" placeholder="输入用户名或手机号..." style="width:100%">
+          </div>
+          <div class="form-group">
+            <label>目标等级</label>
+            <select id="vip-upgrade-level" style="width:100%"></select>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn btn-primary" onclick="doVipUpgrade()">确认升级</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">会员统计</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px" id="vip-stats-grid"></div>
+      </div>
+    </div>
+
+    <!-- Reports Panel -->
+    <div class="panel" id="panel-reports">
+      <div class="panel-header">
+        <h2>报表统计</h2>
+        <button class="btn btn-primary" onclick="exportReport()">📥 导出报表</button>
+      </div>
+      <div class="stat-cards" id="report-stats">
+        <div class="stat-card primary">
+          <div class="stat-label">今日营业额</div>
+          <div class="stat-value" id="rpt-today-income">¥0.00</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">本月营业额</div>
+          <div class="stat-value" id="rpt-month-income">¥0.00</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">今日充值</div>
+          <div class="stat-value" id="rpt-today-recharge">¥0.00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">今日上机次数</div>
+          <div class="stat-value" id="rpt-today-sessions">0</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">用户消费排行</div>
+        <ul class="rank-list" id="report-ranking"></ul>
+      </div>
+      <div class="card">
+        <div class="card-title">月度营业额趋势</div>
+        <div class="chart-placeholder" id="monthly-chart">月度营业额图表区域（数据加载中...）</div>
+      </div>
+      <div class="card">
+        <div class="card-title">会员增长趋势（本年）</div>
+        <div class="chart-placeholder" id="growth-chart">会员增长数据加载中...</div>
+      </div>
+    </div>
+
+    <!-- Logs Panel -->
+    <div class="panel" id="panel-logs">
+      <div class="panel-header">
+        <h2>系统日志</h2>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="exportLogs()">📥 导出日志</button>
+          <button class="btn btn-danger btn-sm" onclick="cleanLogs()">清空日志</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <select id="log-type-filter" onchange="loadLogs(1)">
+            <option value="">全部类型</option>
+            <option value="登录">登录</option>
+            <option value="充值">充值</option>
+            <option value="上机">上机</option>
+            <option value="下机">下机</option>
+            <option value="管理">管理</option>
+          </select>
+          <input type="date" id="log-date-filter" onchange="loadLogs(1)" style="padding:8px 14px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;outline:none">
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>操作人</th>
+              <th>操作类型</th>
+              <th>描述</th>
+              <th>时间</th>
+            </tr>
+          </thead>
+          <tbody id="logs-table-body"></tbody>
+        </table>
+        <div class="pagination" id="logs-pagination"></div>
+      </div>
+    </div>
+
+    <!-- User Center Panel -->
+    <div class="panel" id="panel-user-center">
+      <div class="panel-header">
+        <h2>个人中心</h2>
+      </div>
+      <div class="card">
+        <div class="card-title">个人信息</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px" id="user-profile-info">
+          <div class="stat-card primary"><div class="stat-label">用户名</div><div class="stat-value" style="font-size:18px" id="up-username">-</div></div>
+          <div class="stat-card"><div class="stat-label">真实姓名</div><div class="stat-value" style="font-size:18px" id="up-realname">-</div></div>
+          <div class="stat-card success"><div class="stat-label">账户余额</div><div class="stat-value" style="font-size:18px" id="up-balance">¥0.00</div></div>
+          <div class="stat-card warning"><div class="stat-label">会员等级</div><div class="stat-value" style="font-size:18px" id="up-vip">普通</div></div>
+          <div class="stat-card"><div class="stat-label">积分</div><div class="stat-value" style="font-size:18px" id="up-points">0</div></div>
+          <div class="stat-card"><div class="stat-label">手机号</div><div class="stat-value" style="font-size:18px" id="up-phone">-</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">上机状态</div>
+        <div id="user-online-status">
+          <div class="empty-state">加载中...</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">消费记录（最近20条）</div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>消费金额</th><th>消费类型</th><th>时间</th></tr>
+          </thead>
+          <tbody id="user-consumes-table"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">充值记录（最近20条）</div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>金额</th><th>时间</th><th>操作员</th></tr>
+          </thead>
+          <tbody id="user-recharges-table"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">修改密码</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>原密码</label>
+            <input type="password" id="user-old-password" placeholder="请输入原密码">
+          </div>
+          <div class="form-group">
+            <label>新密码</label>
+            <input type="password" id="user-new-password" placeholder="请输入新密码">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn btn-primary" onclick="changeUserPassword()">修改密码</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- User Modal -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal">
+    <h3 id="user-modal-title">添加用户</h3>
+    <div class="form-group">
+      <label>用户名</label>
+      <input type="text" id="um-username" placeholder="请输入用户名">
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <input type="password" id="um-password" placeholder="请输入密码">
+    </div>
+    <div class="form-group">
+      <label>真实姓名</label>
+      <input type="text" id="um-realname" placeholder="请输入真实姓名">
+    </div>
+    <div class="form-group">
+      <label>身份证号</label>
+      <input type="text" id="um-idcard" placeholder="请输入身份证号">
+    </div>
+    <div class="form-group">
+      <label>手机号</label>
+      <input type="text" id="um-phone" placeholder="请输入手机号">
+    </div>
+    <div class="form-group">
+      <label>初始余额</label>
+      <input type="number" id="um-balance" placeholder="请输入初始余额" min="0" step="0.01" value="0">
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveUser()">保存</button>
+      <button class="btn btn-default" onclick="closeUserModal()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIP Level Modal -->
+<div class="modal-overlay" id="vip-level-modal">
+  <div class="modal">
+    <h3>编辑会员等级</h3>
+    <div class="form-group">
+      <label>选择等级</label>
+      <select id="vlm-level-select"></select>
+    </div>
+    <div class="form-group">
+      <label>等级名称</label>
+      <input type="text" id="vlm-name" placeholder="等级名称">
+    </div>
+    <div class="form-group">
+      <label>折扣率 (0-1)</label>
+      <input type="number" id="vlm-discount" placeholder="折扣率" min="0" max="1" step="0.01">
+    </div>
+    <div class="form-group">
+      <label>升级所需消费金额</label>
+      <input type="number" id="vlm-threshold" placeholder="所需消费金额" min="0" step="0.01">
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveVipLevel()">保存</button>
+      <button class="btn btn-default" onclick="closeVipLevelModal()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+</div>
+
+<script>
+var API_BASE = '';
+var currentUser = null;
+var sessionToken = null;
+var accountType = 'admin';
+var loggingOut = false;
+var isLoggingIn = false;
+var currentPanel = 'dashboard';
+
+function showLoading() {
+  document.getElementById('loading-overlay').classList.add('show');
+}
+
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.remove('show');
+}
+
+function showToast(message, type) {
+  type = type || 'info';
+  var container = document.getElementById('toast-container');
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(function() {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s';
+    setTimeout(function() { toast.remove(); }, 300);
+  }, 2500);
+}
+
+async function apiFetch(url, options) {
+  options = options || {};
+  options.headers = options.headers || {};
+  options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
+  if (sessionToken) {
+    options.headers['Authorization'] = 'Bearer ' + sessionToken;
+  }
+  try {
+    var resp = await fetch(API_BASE + url, options);
+    if (resp.status === 401) {
+      if (!loggingOut && !isLoggingIn) {
+        showToast('登录已过期，请重新登录', 'error');
+        doLogout();
+      }
+      throw new Error('Unauthorized');
+    }
+    var data = await resp.json();
+    if (!resp.ok) {
+      throw new Error(data.message || data.error || '请求失败');
+    }
+    return data;
+  } catch (e) {
+    if (e.message !== 'Unauthorized') {
+      throw e;
+    }
+    throw e;
+  }
+}
+
+// Login
+async function doLogin() {
+  var username = document.getElementById('login-username').value.trim();
+  var password = document.getElementById('login-password').value.trim();
+  var errorEl = document.getElementById('login-error');
+
+  if (!username || !password) {
+    errorEl.textContent = '请输入用户名和密码';
+    return;
+  }
+
+  var btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = '登录中...';
+  errorEl.textContent = '';
+
+  try {
+    isLoggingIn = true;
+    var data = await apiFetch('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ username: username, password: password })
+    });
+    isLoggingIn = false;
+    accountType = data.accountType || 'admin';
+    currentUser = data.admin || data.user || { username: username };
+    sessionToken = data.token;
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    applyRoleBasedUI();
+    showToast('登录成功，欢迎回来！', 'success');
+    if (accountType === 'user') {
+      switchPanel('user-center', document.querySelector('.nav-item.user-only'));
+    } else {
+      switchPanel('dashboard', document.querySelector('.nav-item[data-panel="dashboard"]'));
+    }
+  } catch (e) {
+    isLoggingIn = false;
+    errorEl.textContent = e.message || '登录失败，请检查用户名和密码';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '登 录';
+  }
+}
+
+async function doLogout() {
+  loggingOut = true;
+  try {
+    await apiFetch('/api/logout', { method: 'POST' });
+  } catch (e) {}
+  loggingOut = false;
+  sessionToken = null;
+  accountType = 'admin';
+  currentUser = null;
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').textContent = '';
+}
+
+function applyRoleBasedUI() {
+  if (!currentUser) return;
+
+  var isAdmin = accountType === 'admin';
+  var sidebarUsername = document.getElementById('sidebar-username');
+  var sidebarRole = document.getElementById('sidebar-role');
+  if (sidebarUsername) sidebarUsername.textContent = currentUser.username || (isAdmin ? '管理员' : '用户');
+  if (sidebarRole) sidebarRole.textContent = isAdmin ? '管理员' : '用户';
+
+  var adminElements = document.querySelectorAll('.admin-only');
+  adminElements.forEach(function(el) {
+    if (isAdmin) {
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
+
+  var userElements = document.querySelectorAll('.user-only');
+  userElements.forEach(function(el) {
+    if (!isAdmin) {
+      el.classList.add('visible');
+    } else {
+      el.classList.remove('visible');
+    }
+  });
+
+  var roleAdminElements = document.querySelectorAll('.role-admin-only');
+  roleAdminElements.forEach(function(el) {
+    if (isAdmin) {
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
+}
+
+function switchPanel(panelName, el) {
+  currentPanel = panelName;
+  document.querySelectorAll('.nav-item').forEach(function(item) {
+    item.classList.remove('active');
+  });
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(function(p) {
+    p.classList.remove('active');
+  });
+  var panel = document.getElementById('panel-' + panelName);
+  if (panel) panel.classList.add('active');
+
+  if (panelName === 'dashboard') loadDashboard();
+  else if (panelName === 'users') loadUsers(1);
+  else if (panelName === 'online') loadOnline();
+  else if (panelName === 'recharge') loadRechargePanel();
+  else if (panelName === 'vip') loadVipPanel();
+  else if (panelName === 'reports') loadReports();
+  else if (panelName === 'logs') loadLogs(1);
+  else if (panelName === 'user-center') loadUserCenter();
+}
+
+// Dashboard
+async function loadDashboard() {
+  showLoading();
+  try {
+    var summary = await apiFetch('/api/report/summary');
+    var ranking = await apiFetch('/api/report/ranking');
+    if (summary.data || summary) {
+      var s = summary.data || summary;
+      document.getElementById('stat-today-income').textContent = '¥' + (s.todayRevenue || 0).toFixed(2);
+      document.getElementById('stat-month-income').textContent = '¥' + (s.monthRevenue || 0).toFixed(2);
+      document.getElementById('stat-today-recharge').textContent = '¥' + (s.todayRecharge || 0).toFixed(2);
+      document.getElementById('stat-today-sessions').textContent = s.todayOnlineCount || 0;
+      document.getElementById('stat-total-users').textContent = s.totalUsers || 0;
+    }
+    var rankData = ranking.data || ranking || [];
+    if (Array.isArray(rankData)) {
+      renderRanking('dashboard-ranking', rankData.slice(0, 10));
+    } else if (rankData.ranking) {
+      renderRanking('dashboard-ranking', rankData.ranking.slice(0, 10));
+    } else {
+      renderRanking('dashboard-ranking', []);
+    }
+  } catch (e) {
+    showToast('加载仪表盘失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+function renderRanking(containerId, data) {
+  var container = document.getElementById(containerId);
+  if (!data || data.length === 0) {
+    container.innerHTML = '<div class="empty-state">暂无排行数据</div>';
+    return;
+  }
+  var html = '';
+  data.forEach(function(item, idx) {
+    var numClass = '';
+    if (idx === 0) numClass = 'top1';
+    else if (idx === 1) numClass = 'top2';
+    else if (idx === 2) numClass = 'top3';
+    html += '<li class="rank-item">';
+    html += '<span class="rank-num ' + numClass + '">' + (idx + 1) + '</span>';
+    html += '<span class="rank-name">' + (item.username || '未知用户') + '</span>';
+    html += '<span class="rank-value">¥' + (item.totalAmount || 0).toFixed(2) + '</span>';
+    html += '</li>';
+  });
+  container.innerHTML = html;
+}
+
+// Users
+var usersPage = 1;
+var usersPageSize = 10;
+
+async function loadUsers(page) {
+  usersPage = page || usersPage;
+  var keyword = document.getElementById('user-search').value.trim();
+  showLoading();
+  try {
+    var params = '?page=' + usersPage + '&pageSize=' + usersPageSize;
+    if (keyword) params += '&keyword=' + encodeURIComponent(keyword);
+    var data = await apiFetch('/api/users' + params);
+    var list = data.data || data;
+    var total = data.total || (Array.isArray(list) ? list.length : 0);
+    var rows = Array.isArray(list) ? list : (list.records || list.list || []);
+
+    var tbody = document.getElementById('users-table-body');
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">暂无用户数据</td></tr>';
+    } else {
+      var html = '';
+      rows.forEach(function(u) {
+        html += '<tr>';
+        html += '<td>' + (u.id || '') + '</td>';
+        html += '<td>' + (u.username || '') + '</td>';
+        html += '<td>' + (u.realName || '') + '</td>';
+        html += '<td>' + (u.phone || '') + '</td>';
+        html += '<td>¥' + (u.balance || 0).toFixed(2) + '</td>';
+        html += '<td>' + (u.vipLevelName || '普通') + '</td>';
+        html += '<td>' + (u.status === 1 ? '正常' : '禁用') + '</td>';
+        html += '<td>' + (u.createTime || '') + '</td>';
+        html += '<td>';
+        html += '<button class="btn btn-primary btn-sm" onclick="openUserModal(' + (u.id || 0) + ')">编辑</button> ';
+        html += '<button class="btn btn-danger btn-sm" onclick="deleteUser(' + (u.id || 0) + ')">删除</button>';
+        html += '</td>';
+        html += '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    var totalPages = Math.ceil(total / usersPageSize);
+    var pagEl = document.getElementById('users-pagination');
+    var pagHtml = '';
+    pagHtml += '<button ' + (usersPage <= 1 ? 'disabled' : '') + ' onclick="loadUsers(' + (usersPage - 1) + ')">上一页</button>';
+    pagHtml += '<span class="page-info">第 ' + usersPage + ' / ' + (totalPages || 1) + ' 页 (共 ' + total + ' 条)</span>';
+    pagHtml += '<button ' + (usersPage >= totalPages ? 'disabled' : '') + ' onclick="loadUsers(' + (usersPage + 1) + ')">下一页</button>';
+    pagEl.innerHTML = pagHtml;
+  } catch (e) {
+    showToast('加载用户列表失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+var editingUserId = null;
+
+function openUserModal(userId) {
+  editingUserId = userId || null;
+  document.getElementById('user-modal-title').textContent = userId ? '编辑用户' : '添加用户';
+  document.getElementById('um-username').value = '';
+  document.getElementById('um-password').value = '';
+  document.getElementById('um-realname').value = '';
+  document.getElementById('um-idcard').value = '';
+  document.getElementById('um-phone').value = '';
+  document.getElementById('um-balance').value = '0';
+
+  if (userId) {
+    showLoading();
+    apiFetch('/api/users/' + userId).then(function(data) {
+      var u = data.data || data;
+      if (u) {
+        document.getElementById('um-username').value = u.username || '';
+        document.getElementById('um-realname').value = u.realName || '';
+        document.getElementById('um-idcard').value = u.idCard || '';
+        document.getElementById('um-phone').value = u.phone || '';
+        document.getElementById('um-balance').value = u.balance || 0;
+      }
+      hideLoading();
+    }).catch(function(e) {
+      hideLoading();
+      showToast('加载用户信息失败', 'error');
+    });
+  }
+
+  document.getElementById('user-modal').classList.add('show');
+}
+
+function closeUserModal() {
+  document.getElementById('user-modal').classList.remove('show');
+  editingUserId = null;
+}
+
+async function saveUser() {
+  var username = document.getElementById('um-username').value.trim();
+  var password = document.getElementById('um-password').value.trim();
+  var realName = document.getElementById('um-realname').value.trim();
+  var idCard = document.getElementById('um-idcard').value.trim();
+  var phone = document.getElementById('um-phone').value.trim();
+  var balance = parseFloat(document.getElementById('um-balance').value) || 0;
+
+  if (!username) { showToast('请输入用户名', 'error'); return; }
+  if (!editingUserId && !password) { showToast('请输入密码', 'error'); return; }
+
+  showLoading();
+  try {
+    var body = { username: username, realName: realName, idCard: idCard, phone: phone, balance: balance };
+    if (password) body.password = password;
+
+    if (editingUserId) {
+      await apiFetch('/api/users/' + editingUserId, { method: 'PUT', body: JSON.stringify(body) });
+      showToast('用户更新成功', 'success');
+    } else {
+      await apiFetch('/api/users', { method: 'POST', body: JSON.stringify(body) });
+      showToast('用户添加成功', 'success');
+    }
+    closeUserModal();
+    loadUsers(usersPage);
+  } catch (e) {
+    showToast('保存失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function deleteUser(userId) {
+  if (!confirm('确定要删除该用户吗？此操作不可恢复。')) return;
+  showLoading();
+  try {
+    await apiFetch('/api/users/' + userId, { method: 'DELETE' });
+    showToast('用户已删除', 'success');
+    loadUsers(usersPage);
+  } catch (e) {
+    showToast('删除失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// Online
+async function loadOnline() {
+  showLoading();
+  try {
+    var activeData = await apiFetch('/api/charge/active');
+    var historyData = await apiFetch('/api/charge/history?page=1&pageSize=10');
+
+    var activeList = activeData.data || activeData || [];
+    if (!Array.isArray(activeList)) activeList = activeList.records || activeList.list || [];
+
+    var activeTbody = document.getElementById('active-sessions-table');
+    var activeEmpty = document.getElementById('active-sessions-empty');
+    if (activeList.length === 0) {
+      activeTbody.innerHTML = '';
+      activeEmpty.style.display = 'block';
+    } else {
+      activeEmpty.style.display = 'none';
+      var html = '';
+      activeList.forEach(function(s) {
+        html += '<tr>';
+        html += '<td>' + (s.id || '') + '</td>';
+        html += '<td>' + (s.username || '') + '</td>';
+        html += '<td>' + (s.machineNo || '') + '</td>';
+        html += '<td>' + (s.loginTime || '') + '</td>';
+        html += '<td class="timer" data-start="' + (s.loginTime || '') + '" id="timer-' + s.id + '">计算中...</td>';
+        html += '<td>¥' + (s.cost || 0).toFixed(2) + '</td>';
+        html += '<td><button class="btn btn-danger btn-sm" onclick="stopOnline(' + s.id + ')">下机</button></td>';
+        html += '</tr>';
+      });
+      activeTbody.innerHTML = html;
+    }
+
+    var histList = historyData.data || historyData || [];
+    if (!Array.isArray(histList)) histList = histList.records || histList.list || [];
+    var histTbody = document.getElementById('history-sessions-table');
+    if (histList.length === 0) {
+      histTbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无历史记录</td></tr>';
+    } else {
+      var histHtml = '';
+      histList.forEach(function(s) {
+        histHtml += '<tr>';
+        histHtml += '<td>' + (s.id || '') + '</td>';
+        histHtml += '<td>' + (s.username || '') + '</td>';
+        histHtml += '<td>' + (s.machineNo || '') + '</td>';
+        histHtml += '<td>' + (s.loginTime || '') + '</td>';
+        histHtml += '<td>' + (s.logoutTime || '') + '</td>';
+        histHtml += '<td>' + (s.duration || '') + '</td>';
+        histHtml += '<td>¥' + (s.cost || 0).toFixed(2) + '</td>';
+        histHtml += '</tr>';
+      });
+      histTbody.innerHTML = histHtml;
+    }
+  } catch (e) {
+    showToast('加载上机数据失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+  startTimers();
+}
+
+function startTimers() {
+  setInterval(function() {
+    if (currentPanel !== 'online') return;
+    document.querySelectorAll('.timer[data-start]').forEach(function(el) {
+      var startTime = el.getAttribute('data-start');
+      if (!startTime) return;
+      var start = new Date(startTime).getTime();
+      var now = Date.now();
+      var diff = Math.floor((now - start) / 1000);
+      var hours = Math.floor(diff / 3600);
+      var mins = Math.floor((diff % 3600) / 60);
+      var secs = diff % 60;
+      el.textContent = hours + '时' + String(mins).padStart(2, '0') + '分' + String(secs).padStart(2, '0') + '秒';
+    });
+  }, 1000);
+}
+
+async function startOnline() {
+  var keyword = document.getElementById('online-user-search').value.trim();
+  var machine = document.getElementById('online-machine').value.trim();
+
+  if (!keyword) { showToast('请输入用户名或手机号', 'error'); return; }
+  if (!machine) { showToast('请输入机器号', 'error'); return; }
+
+  showLoading();
+  try {
+    var userId = await findUserId(keyword);
+    await apiFetch('/api/charge/start', {
+      method: 'POST',
+      body: JSON.stringify({ userId: userId, machineNo: machine })
+    });
+    showToast('上机成功', 'success');
+    document.getElementById('online-user-search').value = '';
+    document.getElementById('online-machine').value = '';
+    loadOnline();
+  } catch (e) {
+    showToast('上机失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function stopOnline(id) {
+  if (!confirm('确定要结束该用户的上机吗？')) return;
+  showLoading();
+  try {
+    await apiFetch('/api/charge/stop/' + id, { method: 'POST' });
+    showToast('下机成功', 'success');
+    loadOnline();
+  } catch (e) {
+    showToast('下机失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function findUserId(keyword) {
+  var data = await apiFetch('/api/users?keyword=' + encodeURIComponent(keyword) + '&pageSize=1');
+  var list = data.data || data;
+  var rows = Array.isArray(list) ? list : (list.records || list.list || []);
+  if (rows.length === 0) throw new Error('未找到该用户');
+  return rows[0].id;
+}
+
+// Recharge
+var rechargeUserId = null;
+
+async function doRecharge() {
+  var keyword = document.getElementById('recharge-user-search').value.trim();
+  var amount = parseFloat(document.getElementById('recharge-amount').value);
+
+  if (!keyword) { showToast('请输入用户名或手机号', 'error'); return; }
+  if (!amount || amount <= 0) { showToast('请输入有效充值金额', 'error'); return; }
+
+  showLoading();
+  try {
+    var userId = await findUserId(keyword);
+    await apiFetch('/api/users/recharge', {
+      method: 'POST',
+      body: JSON.stringify({ userId: userId, amount: amount })
+    });
+    showToast('充值成功', 'success');
+    document.getElementById('recharge-amount').value = '';
+    loadRechargePanel();
+  } catch (e) {
+    showToast('充值失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function loadRechargePanel() {
+  showLoading();
+  try {
+    var historyData = await apiFetch('/api/charge/history?page=1&pageSize=50');
+
+    var histList = historyData.data || historyData || [];
+    if (!Array.isArray(histList)) histList = histList.records || histList.list || [];
+
+    var consumeHtml = '';
+    histList.forEach(function(r) {
+      consumeHtml += '<tr>';
+      consumeHtml += '<td>' + (r.id || '') + '</td>';
+      consumeHtml += '<td>' + (r.username || '') + '</td>';
+      consumeHtml += '<td>¥' + (r.cost || 0).toFixed(2) + '</td>';
+      consumeHtml += '<td>上机消费</td>';
+      consumeHtml += '<td>' + (r.duration || '') + '</td>';
+      consumeHtml += '<td>' + (r.logoutTime || '') + '</td>';
+      consumeHtml += '</tr>';
+    });
+    if (!consumeHtml) consumeHtml = '<tr><td colspan="6" class="empty-state">暂无消费记录</td></tr>';
+    document.getElementById('consume-records-table').innerHTML = consumeHtml;
+
+    document.getElementById('recharge-records-table').innerHTML = '<tr><td colspan="7" class="empty-state">暂无充值记录</td></tr>';
+  } catch (e) {
+    showToast('加载充值数据失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// VIP
+async function loadVipPanel() {
+  showLoading();
+  try {
+    var levelsData = await apiFetch('/api/vip/levels');
+    var statsData = await apiFetch('/api/vip/stats');
+
+    var levels = levelsData.data || levelsData || [];
+    if (!Array.isArray(levels)) levels = levels.records || levels.list || [];
+
+    var gridHtml = '';
+    levels.forEach(function(l) {
+      gridHtml += '<div class="vip-level-card">';
+      gridHtml += '<div class="vip-name">' + (l.levelName || '') + '</div>';
+      gridHtml += '<div class="vip-discount">' + ((l.discountRate || 0) * 100).toFixed(0) + '%</div>';
+      gridHtml += '<div class="vip-info">' + (l.description || '') + '</div>';
+      gridHtml += '</div>';
+    });
+    document.getElementById('vip-levels-grid').innerHTML = gridHtml || '<div class="empty-state">暂无会员等级</div>';
+
+    var selectEl = document.getElementById('vip-upgrade-level');
+    selectEl.innerHTML = '';
+    levels.forEach(function(l) {
+      var opt = document.createElement('option');
+      opt.value = l.id || l.levelName;
+      opt.textContent = l.levelName;
+      selectEl.appendChild(opt);
+    });
+
+    var stats = statsData.data || statsData || {};
+    var statsGrid = document.getElementById('vip-stats-grid');
+    var statsHtml = '';
+    var distribution = stats.distribution || [];
+    distribution.forEach(function(d) {
+      statsHtml += '<div class="stat-card"><div class="stat-label">' + (d.levelName || '') + '</div><div class="stat-value">' + (d.userCount || 0) + '人</div></div>';
+    });
+    if (stats.totalVipUsers !== undefined) {
+      statsHtml += '<div class="stat-card primary"><div class="stat-label">VIP用户总数</div><div class="stat-value">' + stats.totalVipUsers + '</div></div>';
+    }
+    statsGrid.innerHTML = statsHtml || '<div class="empty-state">暂无统计数据</div>';
+  } catch (e) {
+    showToast('加载会员数据失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+function openVipLevelModal() {
+  showLoading();
+  apiFetch('/api/vip/levels').then(function(data) {
+    var levels = data.data || data || [];
+    if (!Array.isArray(levels)) levels = levels.records || levels.list || [];
+    var select = document.getElementById('vlm-level-select');
+    select.innerHTML = '';
+    levels.forEach(function(l) {
+      var opt = document.createElement('option');
+      opt.value = l.id;
+      opt.textContent = l.levelName;
+      select.appendChild(opt);
+    });
+    if (levels.length > 0) {
+      document.getElementById('vlm-name').value = levels[0].levelName || '';
+      document.getElementById('vlm-discount').value = levels[0].discountRate || 0;
+    }
+    select.onchange = function() {
+      var sel = levels.find(function(l) { return l.id == select.value; });
+      if (sel) {
+        document.getElementById('vlm-name').value = sel.levelName || '';
+        document.getElementById('vlm-discount').value = sel.discountRate || 0;
+      }
+    };
+    hideLoading();
+    document.getElementById('vip-level-modal').classList.add('show');
+  }).catch(function(e) {
+    hideLoading();
+    showToast('加载等级失败: ' + e.message, 'error');
+  });
+}
+
+function closeVipLevelModal() {
+  document.getElementById('vip-level-modal').classList.remove('show');
+}
+
+async function saveVipLevel() {
+  var id = document.getElementById('vlm-level-select').value;
+  var discount = parseFloat(document.getElementById('vlm-discount').value);
+
+  showLoading();
+  try {
+    await apiFetch('/api/vip/levels/' + id, {
+      method: 'PUT',
+      body: JSON.stringify({ discountRate: discount })
+    });
+    showToast('等级更新成功', 'success');
+    closeVipLevelModal();
+    loadVipPanel();
+  } catch (e) {
+    showToast('保存失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function doVipUpgrade() {
+  var keyword = document.getElementById('vip-upgrade-user').value.trim();
+  var levelId = document.getElementById('vip-upgrade-level').value;
+
+  if (!keyword) { showToast('请输入用户名或手机号', 'error'); return; }
+
+  showLoading();
+  try {
+    var userId = await findUserId(keyword);
+    await apiFetch('/api/vip/upgrade', {
+      method: 'POST',
+      body: JSON.stringify({ userId: userId, levelId: levelId })
+    });
+    showToast('升级成功', 'success');
+    document.getElementById('vip-upgrade-user').value = '';
+    loadVipPanel();
+  } catch (e) {
+    showToast('升级失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// Reports
+async function loadReports() {
+  showLoading();
+  try {
+    var summary = await apiFetch('/api/report/summary');
+    var ranking = await apiFetch('/api/report/ranking');
+    var monthly = await apiFetch('/api/report/monthly');
+    var growth = await apiFetch('/api/report/growth');
+
+    var s = summary.data || summary || {};
+    document.getElementById('rpt-today-income').textContent = '¥' + (s.todayRevenue || 0).toFixed(2);
+    document.getElementById('rpt-month-income').textContent = '¥' + (s.monthRevenue || 0).toFixed(2);
+    document.getElementById('rpt-today-recharge').textContent = '¥' + (s.todayRecharge || 0).toFixed(2);
+    document.getElementById('rpt-today-sessions').textContent = s.todayOnlineCount || 0;
+
+    var rankData = ranking.data || ranking || [];
+    if (Array.isArray(rankData)) {
+      renderRanking('report-ranking', rankData.slice(0, 10));
+    } else if (rankData.ranking) {
+      renderRanking('report-ranking', rankData.ranking.slice(0, 10));
+    } else {
+      renderRanking('report-ranking', []);
+    }
+
+    var monthlyResult = monthly.data || monthly || {};
+    var monthlyData = monthlyResult.monthlyStats || monthlyResult || [];
+    if (!Array.isArray(monthlyData)) monthlyData = monthlyData.records || monthlyData.list || [];
+    var chartEl = document.getElementById('monthly-chart');
+    if (monthlyData.length > 0) {
+      var chartHtml = '<div style="display:flex;align-items:flex-end;gap:12px;height:200px;padding:10px;justify-content:center">';
+      var maxVal = 0;
+      monthlyData.forEach(function(m) {
+        var v = m.amount || m.income || 0;
+        if (v > maxVal) maxVal = v;
+      });
+      monthlyData.forEach(function(m) {
+        var v = m.amount || m.income || 0;
+        var h = maxVal > 0 ? (v / maxVal * 180) : 0;
+        chartHtml += '<div style="display:flex;flex-direction:column;align-items:center;gap:4px">';
+        chartHtml += '<span style="font-size:11px;color:#777">¥' + v.toFixed(0) + '</span>';
+        chartHtml += '<div style="width:40px;height:' + h + 'px;background:linear-gradient(to top,#4A90D9,#74b9ff);border-radius:4px 4px 0 0"></div>';
+        chartHtml += '<span style="font-size:11px;color:#999">' + (m.month || m.label || '') + '</span>';
+        chartHtml += '</div>';
+      });
+      chartHtml += '</div>';
+      chartEl.innerHTML = chartHtml;
+      chartEl.style.background = '#fff';
+      chartEl.style.border = 'none';
+    } else {
+      chartEl.innerHTML = '暂无月度数据';
+    }
+
+    var growthResult = growth.data || growth || {};
+    var growthData = growthResult.growthTrend || growthResult || [];
+    if (!Array.isArray(growthData)) growthData = growthData.records || growthData.list || [];
+    var growthEl = document.getElementById('growth-chart');
+    if (growthData.length > 0) {
+      var maxGrowth = 0;
+      growthData.forEach(function(m) { if ((m.newUsers || 0) > maxGrowth) maxGrowth = m.newUsers || 0; });
+      var chartHtml = '<div style="display:flex;align-items:flex-end;gap:8px;height:180px;padding:10px;justify-content:center">';
+      growthData.forEach(function(m) {
+        var v = m.newUsers || 0;
+        var h = maxGrowth > 0 ? (v / maxGrowth * 160) : 0;
+        chartHtml += '<div style="display:flex;flex-direction:column;align-items:center;gap:4px">';
+        chartHtml += '<span style="font-size:11px;color:#777">' + v + '人</span>';
+        chartHtml += '<div style="width:36px;height:' + h + 'px;background:linear-gradient(to top,#27ae60,#2ecc71);border-radius:4px 4px 0 0"></div>';
+        chartHtml += '<span style="font-size:11px;color:#999">' + m.month + '月</span>';
+        chartHtml += '</div>';
+      });
+      chartHtml += '</div>';
+      growthEl.innerHTML = chartHtml;
+      growthEl.style.background = '#fff';
+      growthEl.style.border = 'none';
+    } else {
+      growthEl.innerHTML = '暂无会员增长数据';
+    }
+  } catch (e) {
+    showToast('加载报表失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+function exportReport() {
+  try {
+    var todayIncome = document.getElementById('rpt-today-income').textContent.replace('¥', '');
+    var monthIncome = document.getElementById('rpt-month-income').textContent.replace('¥', '');
+    var todayRecharge = document.getElementById('rpt-today-recharge').textContent.replace('¥', '');
+    var todaySessions = document.getElementById('rpt-today-sessions').textContent;
+
+    var csvContent = '\uFEFF';
+    csvContent += '指标,数值\n';
+    csvContent += '今日营业额,' + todayIncome + '\n';
+    csvContent += '本月营业额,' + monthIncome + '\n';
+    csvContent += '今日充值,' + todayRecharge + '\n';
+    csvContent += '今日上机次数,' + todaySessions + '\n';
+
+    var rankList = document.querySelectorAll('#report-ranking li');
+    if (rankList.length > 0) {
+      csvContent += '\n用户消费排行\n';
+      csvContent += '排名,用户名,消费金额\n';
+      rankList.forEach(function(li, i) {
+        var name = (li.querySelector('.rank-name') || {}).textContent || '';
+        var amount = (li.querySelector('.rank-value') || {}).textContent || '';
+        csvContent += (i + 1) + ',' + name + ',' + amount + '\n';
+      });
+    }
+
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '网吧经营报表_' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('报表导出成功', 'success');
+  } catch (e) {
+    showToast('导出失败: ' + e.message, 'error');
+  }
+}
+
+// Logs
+var logsPage = 1;
+var logsPageSize = 15;
+
+async function loadLogs(page) {
+  logsPage = page || logsPage;
+  var type = document.getElementById('log-type-filter').value;
+  var date = document.getElementById('log-date-filter').value;
+
+  showLoading();
+  try {
+    var params = '?page=' + logsPage + '&pageSize=' + logsPageSize;
+    if (type) params += '&type=' + encodeURIComponent(type);
+    if (date) params += '&date=' + encodeURIComponent(date);
+
+    var data = await apiFetch('/api/logs' + params);
+    var list = data.data || data;
+    var total = data.total || 0;
+    var rows = Array.isArray(list) ? list : (list.records || list.list || []);
+
+    var tbody = document.getElementById('logs-table-body');
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">暂无日志记录</td></tr>';
+    } else {
+      var html = '';
+      rows.forEach(function(log) {
+        html += '<tr>';
+        html += '<td>' + (log.id || '') + '</td>';
+        html += '<td>' + (log.operatorName || '') + '</td>';
+        html += '<td>' + (log.operationType || '') + '</td>';
+        html += '<td>' + (log.operationContent || '') + '</td>';
+        html += '<td>' + (log.createTime || '') + '</td>';
+        html += '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    var totalPages = Math.ceil(total / logsPageSize) || 1;
+    var pagEl = document.getElementById('logs-pagination');
+    var pagHtml = '';
+    pagHtml += '<button ' + (logsPage <= 1 ? 'disabled' : '') + ' onclick="loadLogs(' + (logsPage - 1) + ')">上一页</button>';
+    pagHtml += '<span class="page-info">第 ' + logsPage + ' / ' + totalPages + ' 页 (共 ' + total + ' 条)</span>';
+    pagHtml += '<button ' + (logsPage >= totalPages ? 'disabled' : '') + ' onclick="loadLogs(' + (logsPage + 1) + ')">下一页</button>';
+    pagEl.innerHTML = pagHtml;
+  } catch (e) {
+    showToast('加载日志失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function exportLogs() {
+  showLoading();
+  try {
+    var type = document.getElementById('log-type-filter').value;
+    var date = document.getElementById('log-date-filter').value;
+    var params = '?pageSize=9999';
+    if (type) params += '&type=' + encodeURIComponent(type);
+    if (date) params += '&date=' + encodeURIComponent(date);
+
+    var data = await apiFetch('/api/logs' + params);
+    var list = data.data || data;
+    var rows = Array.isArray(list) ? list : (list.records || list.list || []);
+
+    var csvContent = '\uFEFF';
+    csvContent += 'ID,操作人,操作类型,描述,时间\n';
+    rows.forEach(function(log) {
+      csvContent += (log.id || '') + ',' + (log.operatorName || '') + ',' + (log.operationType || '') + ',' + (log.operationContent || '') + ',' + (log.createTime || '') + '\n';
+    });
+
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '系统日志_' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('日志导出成功', 'success');
+  } catch (e) {
+    showToast('日志导出失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function cleanLogs() {
+  var date = prompt('请输入要清理的日期（格式：YYYY-MM-DD），留空则清空所有日志：');
+  if (date === null) return;
+  var confirmMsg = date ? '确定要清空 ' + date + ' 的日志吗？此操作不可恢复。' : '确定要清空所有日志吗？此操作不可恢复。';
+  if (!confirm(confirmMsg)) return;
+  showLoading();
+  try {
+    var url = '/api/logs/clean';
+    if (date) url += '?date=' + encodeURIComponent(date);
+    await apiFetch(url, { method: 'DELETE' });
+    showToast('日志已清空', 'success');
+    loadLogs(1);
+  } catch (e) {
+    showToast('清空失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function loadUserCenter() {
+  showLoading();
+  try {
+    var profile = await apiFetch('/api/user/profile');
+    if (profile) {
+      document.getElementById('up-username').textContent = profile.username || '-';
+      document.getElementById('up-realname').textContent = profile.realName || '-';
+      document.getElementById('up-balance').textContent = '¥' + (profile.balance || 0).toFixed(2);
+      document.getElementById('up-vip').textContent = profile.vipLevelName || ('Lv.' + (profile.vipLevel || 1));
+      document.getElementById('up-points').textContent = profile.points || 0;
+      document.getElementById('up-phone').textContent = profile.phone || '-';
+    }
+
+    var onlineStatus = await apiFetch('/api/user/online-status');
+    var statusEl = document.getElementById('user-online-status');
+    if (onlineStatus && onlineStatus.online) {
+      statusEl.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:8px 0">' +
+        '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#27ae60"></span>' +
+        '<span style="font-weight:600;color:#27ae60">当前正在上机</span>' +
+        '<span style="color:#777;margin-left:12px">机器号：' + (onlineStatus.machineNo || '-') + '</span>' +
+        '<span style="color:#777">已上机：' + (onlineStatus.durationMinutes || 0) + ' 分钟</span>' +
+        '</div>';
+    } else {
+      statusEl.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:8px 0">' +
+        '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#bbb"></span>' +
+        '<span style="color:#999">当前未上机</span>' +
+        '</div>';
+    }
+
+    var consumes = await apiFetch('/api/user/consumes');
+    var consumeList = consumes.records || [];
+    var consumeHtml = '';
+    if (consumeList.length === 0) {
+      consumeHtml = '<tr><td colspan="4" class="empty-state">暂无消费记录</td></tr>';
+    } else {
+      consumeList.forEach(function(r) {
+        consumeHtml += '<tr>';
+        consumeHtml += '<td>' + (r.id || '') + '</td>';
+        consumeHtml += '<td>¥' + (r.amount || 0).toFixed(2) + '</td>';
+        consumeHtml += '<td>' + (r.consumeType || '') + '</td>';
+        consumeHtml += '<td>' + (r.createTime || '') + '</td>';
+        consumeHtml += '</tr>';
+      });
+    }
+    document.getElementById('user-consumes-table').innerHTML = consumeHtml;
+
+    var recharges = await apiFetch('/api/user/recharges');
+    var rechargeList = recharges.records || [];
+    var rechargeHtml = '';
+    if (rechargeList.length === 0) {
+      rechargeHtml = '<tr><td colspan="4" class="empty-state">暂无充值记录</td></tr>';
+    } else {
+      rechargeList.forEach(function(r) {
+        rechargeHtml += '<tr>';
+        rechargeHtml += '<td>' + (r.id || '') + '</td>';
+        rechargeHtml += '<td>¥' + (r.amount || 0).toFixed(2) + '</td>';
+        rechargeHtml += '<td>' + (r.rechargeTime || '') + '</td>';
+        rechargeHtml += '<td>' + (r.operatorName || '') + '</td>';
+        rechargeHtml += '</tr>';
+      });
+    }
+    document.getElementById('user-recharges-table').innerHTML = rechargeHtml;
+  } catch (e) {
+    showToast('加载个人中心失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function changeUserPassword() {
+  var oldPwd = document.getElementById('user-old-password').value.trim();
+  var newPwd = document.getElementById('user-new-password').value.trim();
+
+  if (!oldPwd) { showToast('请输入原密码', 'error'); return; }
+  if (!newPwd) { showToast('请输入新密码', 'error'); return; }
+  if (newPwd.length < 4) { showToast('新密码至少4位', 'error'); return; }
+
+  showLoading();
+  try {
+    await apiFetch('/api/user/password', {
+      method: 'PUT',
+      body: JSON.stringify({ oldPassword: oldPwd, newPassword: newPwd })
+    });
+    showToast('密码修改成功', 'success');
+    document.getElementById('user-old-password').value = '';
+    document.getElementById('user-new-password').value = '';
+  } catch (e) {
+    showToast('修改失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// Keyboard support
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    var loginOverlay = document.getElementById('login-overlay');
+    if (loginOverlay.style.display !== 'none') {
+      doLogin();
+    }
+  }
+});
+
+// Modal click-outside close
+document.getElementById('user-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeUserModal();
+});
+document.getElementById('vip-level-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeVipLevelModal();
+});
+
+// Check session on load
+(async function() {
+  try {
+    var data = await apiFetch('/api/session');
+    if (data && data.loggedIn) {
+      accountType = data.accountType || 'admin';
+      currentUser = data.admin || data.user;
+      sessionToken = data.token;
+      document.getElementById('login-overlay').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      applyRoleBasedUI();
+      if (accountType === 'user') {
+        switchPanel('user-center', document.querySelector('.nav-item.user-only'));
+      } else {
+        switchPanel('dashboard', document.querySelector('.nav-item[data-panel="dashboard"]'));
+      }
+    }
+  } catch (e) {
+    // Not logged in, stay on login
+  }
+})();
+</script>
+
+</body>
+</html>
