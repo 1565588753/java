@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.internetcafe.entity.Admin;
 import com.internetcafe.entity.User;
+import com.internetcafe.service.LogService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -285,18 +286,15 @@ public class BaseController {
      * @return 参数值，如果参数不存在则返回null
      */
     protected static String getQueryParam(HttpExchange exchange, String key) {
-        /* 获取完整的查询字符串（?之后的部分） */
         String query = exchange.getRequestURI().getQuery();
         if (query == null || query.isEmpty()) {
             return null;
         }
 
-        /* 遍历所有查询参数，找到匹配的key */
         for (String param : query.split("&")) {
             String[] pair = param.split("=", 2);
             if (pair.length == 2 && pair[0].equals(key)) {
                 try {
-                    /* 对URL编码的参数值进行解码 */
                     return java.net.URLDecoder.decode(pair[1], "UTF-8");
                 } catch (Exception e) {
                     return pair[1];
@@ -305,5 +303,16 @@ public class BaseController {
         }
 
         return null;
+    }
+
+    protected static void handleException(HttpExchange exchange, Exception e, String context) throws IOException {
+        e.printStackTrace();
+        try {
+            LogService logService = new LogService();
+            logService.addErrorLog("SYSTEM", context + ": " + e.getMessage());
+        } catch (Exception logEx) {
+            System.err.println("记录异常日志失败: " + logEx.getMessage());
+        }
+        sendError(exchange, 500, "服务器内部错误: " + e.getMessage());
     }
 }

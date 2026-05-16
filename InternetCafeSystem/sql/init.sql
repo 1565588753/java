@@ -106,7 +106,24 @@ CREATE TABLE consume_record (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='消费记录表';
 
 -- ==========================================
--- 7. 系统日志表 system_log
+-- 7. 系统配置表 system_config
+-- ==========================================
+DROP TABLE IF EXISTS system_config;
+CREATE TABLE system_config (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    config_key VARCHAR(50) NOT NULL UNIQUE,
+    config_value VARCHAR(200) NOT NULL,
+    description VARCHAR(200) DEFAULT '',
+    update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO system_config (config_key, config_value, description) VALUES
+('base_price', '5.0', '基础上网单价（元/小时）'),
+('peak_price', '8.0', '高峰时段单价（元/小时）'),
+('night_price', '3.0', '深夜时段单价（元/小时）');
+
+-- ==========================================
+-- 8. 系统日志表 system_log
 -- ==========================================
 DROP TABLE IF EXISTS system_log;
 CREATE TABLE system_log (
@@ -140,3 +157,50 @@ INSERT INTO user (username, password, real_name, id_card, phone, balance, vip_le
 ('test001', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '张三', '110101199001011234', '13800138001', 100.00, 1, 100, 1),
 ('test002', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '李四', '110101199002021235', '13800138002', 200.00, 2, 500, 1),
 ('test003', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '王五', '110101199003031236', '13800138003', 50.00, 1, 50, 1);
+
+-- ==========================================
+-- 8. 零食商品表 snack_product
+-- ==========================================
+DROP TABLE IF EXISTS snack_product;
+CREATE TABLE snack_product (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL COMMENT '商品名称',
+    price DECIMAL(10,2) NOT NULL COMMENT '商品单价',
+    image VARCHAR(500) DEFAULT '' COMMENT '商品图片（base64或URL）',
+    stock INT NOT NULL DEFAULT 999 COMMENT '库存数量',
+    status TINYINT NOT NULL DEFAULT 1 COMMENT '状态：0-下架, 1-上架',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ==========================================
+-- 9. 零食订单表 snack_order
+-- ==========================================
+DROP TABLE IF EXISTS snack_order;
+CREATE TABLE snack_order (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL COMMENT '用户ID',
+    product_id INT NOT NULL COMMENT '商品ID',
+    product_name VARCHAR(100) NOT NULL COMMENT '商品名称（冗余）',
+    quantity INT NOT NULL DEFAULT 1 COMMENT '购买数量',
+    unit_price DECIMAL(10,2) NOT NULL COMMENT '单价',
+    total_price DECIMAL(10,2) NOT NULL COMMENT '总价',
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '状态：0-待确认, 1-已完成, 2-已取消',
+    order_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    confirm_time DATETIME DEFAULT NULL,
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status),
+    CONSTRAINT fk_snack_user FOREIGN KEY (user_id) REFERENCES user(id),
+    CONSTRAINT fk_snack_product FOREIGN KEY (product_id) REFERENCES snack_product(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 初始化示例商品
+INSERT INTO snack_product (name, price, stock, status) VALUES
+('康师傅红烧牛肉面', 5.00, 100, 1),
+('统一冰红茶', 4.00, 200, 1),
+('恰恰瓜子', 6.00, 150, 1),
+('乐事薯片', 8.00, 80, 1),
+('可口可乐', 4.00, 200, 1),
+('农夫山泉', 2.00, 300, 1),
+('红牛', 6.00, 120, 1),
+('火腿肠', 3.00, 200, 1);

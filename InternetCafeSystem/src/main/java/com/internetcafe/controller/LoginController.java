@@ -119,8 +119,7 @@ public class LoginController extends BaseController implements HttpHandler {
                 sendError(exchange, 404, "接口不存在: " + method + " " + path);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            sendError(exchange, 500, "服务器内部错误: " + e.getMessage());
+            handleException(exchange, e, "LoginController处理请求异常");
         }
     }
 
@@ -225,6 +224,7 @@ public class LoginController extends BaseController implements HttpHandler {
             userInfo.put("realName", user.getRealName());
             userInfo.put("balance", user.getBalance());
             userInfo.put("vipLevel", user.getVipLevel());
+            userInfo.put("vipLevelName", user.getVipLevelName());
             userInfo.put("points", user.getPoints());
             userInfo.put("phone", user.getPhone());
             response.put("user", userInfo);
@@ -312,6 +312,7 @@ public class LoginController extends BaseController implements HttpHandler {
             userInfo.put("realName", user.getRealName());
             userInfo.put("balance", user.getBalance());
             userInfo.put("vipLevel", user.getVipLevel());
+            userInfo.put("vipLevelName", user.getVipLevelName());
             userInfo.put("points", user.getPoints());
             userInfo.put("phone", user.getPhone());
             response.put("user", userInfo);
@@ -371,6 +372,7 @@ public class LoginController extends BaseController implements HttpHandler {
             resp.put("realName", freshUser.getRealName());
             resp.put("balance", freshUser.getBalance());
             resp.put("vipLevel", freshUser.getVipLevel());
+            resp.put("vipLevelName", freshUser.getVipLevelName());
             resp.put("points", freshUser.getPoints());
             resp.put("phone", freshUser.getPhone());
         }

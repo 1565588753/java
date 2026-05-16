@@ -94,6 +94,7 @@ public class DBUtil {
             return null;
         }
         try {
+            dataSource.setLoginTimeout(5);
             Connection conn = dataSource.getConnection();
             return conn;
         } catch (SQLException e) {

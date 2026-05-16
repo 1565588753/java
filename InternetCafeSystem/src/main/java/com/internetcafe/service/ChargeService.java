@@ -2,6 +2,7 @@ package com.internetcafe.service;
 
 import com.internetcafe.dao.ConsumeRecordDao;
 import com.internetcafe.dao.OnlineRecordDao;
+import com.internetcafe.dao.SystemConfigDao;
 import com.internetcafe.dao.UserDao;
 import com.internetcafe.dao.VipLevelDao;
 import com.internetcafe.entity.ConsumeRecord;
@@ -40,6 +41,11 @@ public class ChargeService {
     /** 会员等级数据访问对象，负责 vip_level 表的数据库操作 */
     private VipLevelDao vipLevelDao;
 
+    /** 系统配置数据访问对象，负责 system_config 表的数据库操作 */
+    private SystemConfigDao systemConfigDao;
+
+    private LogService logService;
+
     /**
      * 标准每小时单价（元）
      * 所有计费以此为基础，再根据会员等级折扣进行计算
@@ -73,6 +79,8 @@ public class ChargeService {
         this.userDao = new UserDao();
         this.consumeRecordDao = new ConsumeRecordDao();
         this.vipLevelDao = new VipLevelDao();
+        this.systemConfigDao = new SystemConfigDao();
+        this.logService = new LogService();
     }
 
     /**
@@ -96,49 +104,51 @@ public class ChargeService {
      *                          "创建上机记录失败" - 数据库插入操作失败
      */
     public Integer startOnline(Integer userId, String machineNo) {
-        /* 第一步：检查用户是否存在 */
-        User user = userDao.findById(userId);
-        if (user == null) {
-            throw new RuntimeException("用户不存在");
+        try {
+            User user = userDao.findById(userId);
+            if (user == null) {
+                throw new RuntimeException("用户不存在");
+            }
+
+            if (user.getStatus() == null || user.getStatus() != 1) {
+                throw new RuntimeException("用户已被禁用，无法上机");
+            }
+
+            OnlineRecord activeRecord = onlineRecordDao.findActiveByUserId(userId);
+            if (activeRecord != null) {
+                throw new RuntimeException("该用户正在上机中，无法重复上机");
+            }
+
+            OnlineRecord machineRecord = onlineRecordDao.findActiveByMachineNo(machineNo);
+            if (machineRecord != null) {
+                throw new RuntimeException("该机器已被占用");
+            }
+
+            if (user.getBalance() == null || user.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException("账户余额不足，请先充值");
+            }
+
+            OnlineRecord record = new OnlineRecord();
+            record.setUserId(userId);
+            record.setMachineNo(machineNo);
+            record.setLoginTime(DateUtil.getCurrentDateTime());
+            record.setDuration(0L);
+            record.setCost(BigDecimal.ZERO);
+            record.setStatus(1);
+
+            Integer recordId = onlineRecordDao.insert(record);
+            if (recordId == null || recordId == -1) {
+                throw new RuntimeException("创建上机记录失败");
+            }
+
+            return recordId;
+        } catch (RuntimeException e) {
+            logService.addErrorLog("SYSTEM", "开始上机失败: userId=" + userId + ", machineNo=" + machineNo + ", " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logService.addErrorLog("SYSTEM", "开始上机异常: userId=" + userId + ", machineNo=" + machineNo + ", " + e.getMessage());
+            throw new RuntimeException("数据库连接失败: " + e.getMessage());
         }
-
-        /* 第二步：检查用户状态是否正常（status=1 表示正常，0 表示禁用） */
-        if (user.getStatus() == null || user.getStatus() != 1) {
-            throw new RuntimeException("用户已被禁用，无法上机");
-        }
-
-        /* 第三步：检查用户是否已经在上机中（每个用户同时只能有一个活跃的上机会话） */
-        OnlineRecord activeRecord = onlineRecordDao.findActiveByUserId(userId);
-        if (activeRecord != null) {
-            throw new RuntimeException("该用户正在上机中，无法重复上机");
-        }
-
-        /* 第四步：检查指定机器是否已被占用（每台机器同时只能有一个用户使用） */
-        OnlineRecord machineRecord = onlineRecordDao.findActiveByMachineNo(machineNo);
-        if (machineRecord != null) {
-            throw new RuntimeException("该机器已被占用");
-        }
-
-        /* 第五步：检查用户账户余额是否大于0 */
-        if (user.getBalance() == null || user.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("账户余额不足，请先充值");
-        }
-
-        /* 第六步：创建上机记录 */
-        OnlineRecord record = new OnlineRecord();
-        record.setUserId(userId);
-        record.setMachineNo(machineNo);
-        record.setLoginTime(DateUtil.getCurrentDateTime());
-        record.setDuration(0L);      /* 初始时长为0 */
-        record.setCost(BigDecimal.ZERO);  /* 初始消费为0 */
-        record.setStatus(1); /* 状态：1=上机中 */
-
-        Integer recordId = onlineRecordDao.insert(record);
-        if (recordId == null || recordId == -1) {
-            throw new RuntimeException("创建上机记录失败");
-        }
-
-        return recordId;
     }
 
     /**
@@ -224,11 +234,15 @@ public class ChargeService {
             }
 
             DBUtil.commitTransaction(conn);
+            logService.addOperationLog("SYSTEM", "下机结算",
+                    "下机结算完成: recordId=" + recordId + ", userId=" + record.getUserId() + ", cost=" + cost);
             return cost;
         } catch (RuntimeException e) {
+            logService.addErrorLog("SYSTEM", "下机结算失败: recordId=" + recordId + ", " + e.getMessage());
             throw e;
         } catch (Exception e) {
             DBUtil.rollbackTransaction(conn);
+            logService.addErrorLog("SYSTEM", "下机结算异常: recordId=" + recordId + ", " + e.getMessage());
             throw new RuntimeException("结算异常：" + e.getMessage());
         } finally {
             DBUtil.closeAll(conn, null);
@@ -299,12 +313,48 @@ public class ChargeService {
         int hour = cal.get(Calendar.HOUR_OF_DAY);
 
         if (hour >= 0 && hour < 8) {
-            return NIGHT_PRICE_PER_HOUR;
+            return getNightPrice();
         } else if (hour >= 18 && hour < 24) {
-            return PEAK_PRICE_PER_HOUR;
+            return getPeakPrice();
         } else {
-            return NORMAL_PRICE_PER_HOUR;
+            return getBasePrice();
         }
+    }
+
+    public BigDecimal getBasePrice() {
+        String value = systemConfigDao.getConfig("base_price");
+        if (value != null) {
+            try {
+                return new BigDecimal(value);
+            } catch (NumberFormatException e) {
+                System.err.println("基础价格配置值无效: " + value);
+            }
+        }
+        return NORMAL_PRICE_PER_HOUR;
+    }
+
+    public BigDecimal getPeakPrice() {
+        String value = systemConfigDao.getConfig("peak_price");
+        if (value != null) {
+            try {
+                return new BigDecimal(value);
+            } catch (NumberFormatException e) {
+                System.err.println("高峰价格配置值无效: " + value);
+            }
+        }
+        return PEAK_PRICE_PER_HOUR;
+    }
+
+    public BigDecimal getNightPrice() {
+        String value = systemConfigDao.getConfig("night_price");
+        if (value != null) {
+            try {
+                return new BigDecimal(value);
+            } catch (NumberFormatException e) {
+                System.err.println("深夜价格配置值无效: " + value);
+            }
+        }
+        return NIGHT_PRICE_PER_HOUR;
     }
 
     /**
@@ -315,12 +365,10 @@ public class ChargeService {
      * @return 标准费用（元），保留两位小数
      */
     private BigDecimal calculateNormalFee(Long durationMinutes) {
-        /* 将分钟转换为小时 */
         BigDecimal hours = new BigDecimal(durationMinutes)
                 .divide(new BigDecimal("60"), 4, RoundingMode.HALF_UP);
 
-        /* 标准价格 × 小时数 */
-        return NORMAL_PRICE_PER_HOUR
+        return getBasePrice()
                 .multiply(hours)
                 .setScale(2, RoundingMode.HALF_UP);
     }
@@ -389,10 +437,13 @@ public class ChargeService {
                     stopOnline(record.getId());
                     System.out.println("自动下机：用户ID=" + record.getUserId()
                             + "，上机记录ID=" + record.getId() + "，原因：余额不足");
+                    logService.addOperationLog("SYSTEM", "自动下机",
+                            "余额不足自动下机: userId=" + record.getUserId() + ", recordId=" + record.getId());
                 }
             } catch (Exception e) {
                 System.err.println("自动检查余额时发生异常，上机记录ID=" + record.getId()
                         + "：" + e.getMessage());
+                logService.addErrorLog("SYSTEM", "自动余额检查异常: recordId=" + record.getId() + ", " + e.getMessage());
             }
         }
     }
