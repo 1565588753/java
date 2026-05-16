@@ -75,7 +75,9 @@ public class SnackController extends BaseController implements HttpHandler {
                     return;
                 }
 
-                if ("PUT".equals(method)) {
+                if ("GET".equals(method)) {
+                    handleGetProduct(exchange, id);
+                } else if ("PUT".equals(method)) {
                     handleUpdateProduct(exchange, id);
                 } else if ("DELETE".equals(method)) {
                     handleDeleteProduct(exchange, id);
@@ -146,6 +148,17 @@ public class SnackController extends BaseController implements HttpHandler {
         List<SnackProduct> products = snackService.getAllProductsAdmin();
         Map<String, Object> response = new HashMap<>();
         response.put("list", products);
+        sendJson(exchange, response);
+    }
+
+    private void handleGetProduct(HttpExchange exchange, int id) throws IOException {
+        SnackProduct product = snackService.getProductById(id);
+        Map<String, Object> response = new HashMap<>();
+        if (product != null) {
+            response.put("data", product);
+        } else {
+            response.put("data", null);
+        }
         sendJson(exchange, response);
     }
 

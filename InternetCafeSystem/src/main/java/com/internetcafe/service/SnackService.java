@@ -49,6 +49,10 @@ public class SnackService {
         return snackProductDao.delete(id);
     }
 
+    public SnackProduct getProductById(int id) {
+        return snackProductDao.findById(id);
+    }
+
     public SnackOrder placeOrder(int userId, int productId, int quantity) {
         SnackProduct product = snackProductDao.findById(productId);
         if (product == null) {

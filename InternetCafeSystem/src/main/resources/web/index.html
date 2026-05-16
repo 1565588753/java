@@ -1148,7 +1148,7 @@ table tbody tr:hover {
       <div class="card">
         <div class="card-title">商品列表</div>
         <table>
-          <thead><tr><th>ID</th><th>图片</th><th>商品名</th><th>单价</th><th>库存</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr><th>ID</th><th>商品名</th><th>单价</th><th>库存</th><th>状态</th><th>操作</th></tr></thead>
           <tbody id="snack-products-table"></tbody>
         </table>
       </div>
@@ -1314,20 +1314,6 @@ table tbody tr:hover {
     <div class="form-group"><label>商品名称</label><input type="text" id="snm-name" placeholder="商品名称"></div>
     <div class="form-group"><label>单价（元）</label><input type="number" id="snm-price" min="0" step="0.01" placeholder="单价"></div>
     <div class="form-group"><label>库存</label><input type="number" id="snm-stock" min="0" step="1" value="100"></div>
-    <div class="form-group">
-      <label>商品图片</label>
-      <div style="display:flex;gap:10px;align-items:flex-start">
-        <div id="snm-image-preview" style="width:80px;height:80px;border:2px dashed #d9d9d9;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;flex-shrink:0">
-          <span style="color:#bbb;font-size:12px">未选择</span>
-        </div>
-        <div style="flex:1">
-          <input type="file" id="snm-image-file" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" onchange="previewSnackImage(this)" style="display:none">
-          <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('snm-image-file').click()">选择图片</button>
-          <button type="button" class="btn btn-default btn-sm" onclick="clearSnackImage()" style="margin-left:6px">清除</button>
-          <div style="font-size:12px;color:#999;margin-top:6px">支持 PNG/JPG/GIF/WEBP/BMP，建议尺寸 400x400</div>
-        </div>
-      </div>
-    </div>
     <div class="form-group"><label>状态</label><select id="snm-status"><option value="1">上架</option><option value="0">下架</option></select></div>
     <div class="form-actions">
       <button class="btn btn-primary" onclick="saveSnackProduct()">保存</button>
@@ -1389,7 +1375,7 @@ async function apiFetch(url, options) {
         showToast('登录已过期，请重新登录', 'error');
         doLogout();
       }
-      throw new Error('Unauthorized');
+      throw new Error('密码错误');
     }
 var contentType = resp.headers.get('content-type') || '';
     var data;
@@ -1407,7 +1393,7 @@ var contentType = resp.headers.get('content-type') || '';
     }
     return data;
   } catch (e) {
-    if (e.message !== 'Unauthorized') {
+    if (e.message !== '密码错误') {
       throw e;
     }
     throw e;
@@ -2448,24 +2434,6 @@ async function changeUserPassword() {
 
 // Snack Shop
 var snackEditingId = null;
-var snackPendingImageFile = null;
-
-function previewSnackImage(input) {
-  if (input.files && input.files[0]) {
-    snackPendingImageFile = input.files[0];
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      document.getElementById('snm-image-preview').innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">';
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-function clearSnackImage() {
-  snackPendingImageFile = null;
-  document.getElementById('snm-image-file').value = '';
-  document.getElementById('snm-image-preview').innerHTML = '<span style="color:#bbb;font-size:12px">未选择</span>';
-}
 
 async function loadSnackAdmin() {
   showLoading();
@@ -2477,7 +2445,6 @@ async function loadSnackAdmin() {
     products.forEach(function(p) {
       productsHtml += '<tr>';
       productsHtml += '<td>' + (p.id || '') + '</td>';
-      productsHtml += '<td>' + (p.image ? '<img src="' + p.image + '" style="width:40px;height:40px;object-fit:cover;border-radius:4px">' : '-') + '</td>';
       productsHtml += '<td>' + (p.name || '') + '</td>';
       productsHtml += '<td>¥' + (p.price || 0).toFixed(2) + '</td>';
       productsHtml += '<td>' + (p.stock || 0) + '</td>';
@@ -2485,7 +2452,7 @@ async function loadSnackAdmin() {
       productsHtml += '<td><button class="btn btn-primary btn-sm" onclick="openSnackProductModal(' + (p.id || 0) + ')">编辑</button> <button class="btn btn-danger btn-sm" onclick="deleteSnackProduct(' + (p.id || 0) + ')">删除</button></td>';
       productsHtml += '</tr>';
     });
-    if (!productsHtml) productsHtml = '<tr><td colspan="7" class="empty-state">暂无商品</td></tr>';
+    if (!productsHtml) productsHtml = '<tr><td colspan="6" class="empty-state">暂无商品</td></tr>';
     document.getElementById('snack-products-table').innerHTML = productsHtml;
 
     var pendingData = await apiFetch('/api/snacks/orders/pending');
@@ -2572,9 +2539,6 @@ function renderSnackShopGrid(products) {
   var html = '';
   products.forEach(function(p) {
     html += '<div style="border:1px solid #f0f0f0;border-radius:8px;padding:12px;text-align:center;background:#fff">';
-    if (p.image) {
-      html += '<img src="' + p.image + '" style="width:100%;height:140px;object-fit:cover;border-radius:6px;margin-bottom:8px" onerror="this.style.display=\'none\'">';
-    }
     html += '<div style="font-weight:600;font-size:15px;margin-bottom:4px">' + (p.name || '') + '</div>';
     html += '<div style="color:#E74C3C;font-weight:700;font-size:18px;margin-bottom:8px">¥' + (p.price || 0).toFixed(2) + '</div>';
     html += '<div style="font-size:12px;color:#999;margin-bottom:8px">库存: ' + (p.stock || 0) + '</div>';
@@ -2586,14 +2550,11 @@ function renderSnackShopGrid(products) {
 
 function openSnackProductModal(id) {
   snackEditingId = id || null;
-  snackPendingImageFile = null;
   document.getElementById('snack-modal-title').textContent = id ? '编辑商品' : '添加商品';
   document.getElementById('snm-name').value = '';
   document.getElementById('snm-price').value = '';
   document.getElementById('snm-stock').value = '100';
-  document.getElementById('snm-image-file').value = '';
   document.getElementById('snm-status').value = '1';
-  document.getElementById('snm-image-preview').innerHTML = '<span style="color:#bbb;font-size:12px">未选择</span>';
 
   if (id) {
     showLoading();
@@ -2604,9 +2565,6 @@ function openSnackProductModal(id) {
         document.getElementById('snm-price').value = p.price || '';
         document.getElementById('snm-stock').value = p.stock || 100;
         document.getElementById('snm-status').value = p.status !== undefined ? p.status : 1;
-        if (p.image) {
-          document.getElementById('snm-image-preview').innerHTML = '<img src="' + p.image + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\'<span style=color:#bbb;font-size:12px>图片加载失败</span>\'">';
-        }
       }
       hideLoading();
     }).catch(function(e) {
@@ -2634,22 +2592,7 @@ async function saveSnackProduct() {
 
   showLoading();
   try {
-    var imageUrl = '';
-    if (snackPendingImageFile) {
-      var formData = new FormData();
-      formData.append('file', snackPendingImageFile);
-      var uploadResp = await fetch('/api/upload/snack-image', {
-        method: 'POST',
-        headers: { 'Authorization': sessionToken ? 'Bearer ' + sessionToken : '' },
-        body: formData
-      });
-      var uploadData = await uploadResp.json();
-      if (uploadData.data && uploadData.data.url) {
-        imageUrl = uploadData.data.url;
-      }
-    }
-
-    var body = { name: name, price: price, stock: stock, image: imageUrl, status: status };
+    var body = { name: name, price: price, stock: stock, status: status };
     if (snackEditingId) {
       await apiFetch('/api/snacks/products/' + snackEditingId, { method: 'PUT', body: JSON.stringify(body) });
       showToast('商品更新成功', 'success');
@@ -2793,7 +2736,7 @@ async function loadRepairAdmin(page) {
   showLoading();
   try {
     var pendingCountData = await apiFetch('/api/repair/pending-count');
-    document.getElementById('repair-pending-count').textContent = pendingCountData.data || pendingCountData || 0;
+    document.getElementById('repair-pending-count').textContent = pendingCountData.count || 0;
     var statusFilter = document.getElementById('repair-status-filter').value;
     var allResp = await apiFetch('/api/repair');
     var allList = allResp.data || allResp || [];
