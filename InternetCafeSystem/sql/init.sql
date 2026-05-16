@@ -120,7 +120,11 @@ CREATE TABLE system_config (
 INSERT INTO system_config (config_key, config_value, description) VALUES
 ('base_price', '5.0', '基础上网单价（元/小时）'),
 ('peak_price', '8.0', '高峰时段单价（元/小时）'),
-('night_price', '3.0', '深夜时段单价（元/小时）');
+('night_price', '3.0', '深夜时段单价（元/小时）'),
+('peak_start_hour', '18', '高峰时段开始小时（0-23）'),
+('peak_end_hour', '23', '高峰时段结束小时（0-23）'),
+('night_start_hour', '0', '深夜时段开始小时（0-23）'),
+('night_end_hour', '7', '深夜时段结束小时（0-23）');
 
 -- ==========================================
 -- 8. 系统日志表 system_log
@@ -204,3 +208,22 @@ INSERT INTO snack_product (name, price, stock, status) VALUES
 ('农夫山泉', 2.00, 300, 1),
 ('红牛', 6.00, 120, 1),
 ('火腿肠', 3.00, 200, 1);
+
+-- ==========================================
+-- 11. 报修表 repair_request
+-- ==========================================
+DROP TABLE IF EXISTS repair_request;
+CREATE TABLE repair_request (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL COMMENT '报修用户ID',
+    username VARCHAR(50) NOT NULL COMMENT '报修用户名',
+    machine_no VARCHAR(10) NOT NULL COMMENT '报修机器号',
+    description VARCHAR(500) NOT NULL COMMENT '故障描述',
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '状态：0-待处理, 1-已处理',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '报修时间',
+    handle_time DATETIME DEFAULT NULL COMMENT '处理时间',
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status),
+    INDEX idx_create_time (create_time),
+    CONSTRAINT fk_repair_user FOREIGN KEY (user_id) REFERENCES user(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

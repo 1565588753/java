@@ -243,6 +243,7 @@ body {
   margin-left: 220px;
   padding: 24px;
   min-height: 100vh;
+  width: calc(100% - 220px);
 }
 
 .table-wrapper {
@@ -697,23 +698,29 @@ table tbody tr:hover {
       <div class="nav-item admin-only" data-panel="vip" onclick="switchPanel('vip', this)">
         <span class="nav-icon">👑</span><span>会员管理</span>
       </div>
-<div class="nav-item admin-only" data-panel="settings" onclick="switchPanel('settings', this)">
-        <span class="nav-icon">⚙️</span><span>系统设置</span>
-      </div>
-      <div class="nav-item role-admin-only admin-only" data-panel="reports" onclick="switchPanel('reports', this)">
-        <span class="nav-icon">📈</span><span>报表统计</span>
-      </div>
-      <div class="nav-item role-admin-only admin-only" data-panel="logs" onclick="switchPanel('logs', this)">
-        <span class="nav-icon">📋</span><span>系统日志</span>
+      <div class="nav-item admin-only" data-panel="settings" onclick="switchPanel('settings', this)">
+        <span class="nav-icon">⚙️</span><span>上网单价管理</span>
       </div>
       <div class="nav-item admin-only" data-panel="snack-admin" onclick="switchPanel('snack-admin', this)">
         <span class="nav-icon">🛒</span><span>超市管理</span>
+      </div>
+      <div class="nav-item user-only" data-panel="repair" onclick="switchPanel('repair', this)">
+        <span class="nav-icon">🔧</span><span>报修</span>
+      </div>
+      <div class="nav-item admin-only" data-panel="repair-admin" onclick="switchPanel('repair-admin', this)">
+        <span class="nav-icon">🔧</span><span>报修管理</span>
       </div>
       <div class="nav-item user-only" data-panel="user-center" onclick="switchPanel('user-center', this)">
         <span class="nav-icon">🏠</span><span>个人中心</span>
       </div>
       <div class="nav-item user-only" data-panel="snack-shop" onclick="switchPanel('snack-shop', this)">
         <span class="nav-icon">🍿</span><span>零食超市</span>
+      </div>
+      <div class="nav-item role-admin-only admin-only" data-panel="logs" onclick="switchPanel('logs', this)">
+        <span class="nav-icon">📋</span><span>系统日志</span>
+      </div>
+      <div class="nav-item role-admin-only admin-only" data-panel="reports" onclick="switchPanel('reports', this)">
+        <span class="nav-icon">📈</span><span>报表统计</span>
       </div>
       <div class="nav-item logout" onclick="doLogout()">
         <span class="nav-icon">🚪</span><span>退出登录</span>
@@ -950,7 +957,31 @@ table tbody tr:hover {
 
 <!-- Settings Panel -->
     <div class="panel" id="panel-settings">
-      <div class="panel-header"><h2>系统设置</h2></div>
+      <div class="panel-header"><h2>上网单价管理</h2></div>
+      <div class="card">
+        <div class="card-title">时段划分设置</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>高峰期开始时间（小时 0-23）</label>
+            <input type="number" id="settings-peak-start" min="0" max="23" step="1" placeholder="如：18">
+          </div>
+          <div class="form-group">
+            <label>高峰期结束时间（小时 0-23）</label>
+            <input type="number" id="settings-peak-end" min="0" max="23" step="1" placeholder="如：23">
+          </div>
+          <div class="form-group">
+            <label>深夜期开始时间（小时 0-23）</label>
+            <input type="number" id="settings-night-start" min="0" max="23" step="1" placeholder="如：0">
+          </div>
+          <div class="form-group">
+            <label>深夜期结束时间（小时 0-23）</label>
+            <input type="number" id="settings-night-end" min="0" max="23" step="1" placeholder="如：7">
+          </div>
+        </div>
+        <div style="font-size:12px;color:#999;margin-top:8px">
+          说明：高峰期和深夜期以外的时段为普通价格时段。
+        </div>
+      </div>
       <div class="card">
         <div class="card-title">上网费单价设置（VIP等级自动打折）</div>
         <div class="form-row">
@@ -1052,6 +1083,62 @@ table tbody tr:hover {
           <tbody id="logs-table-body"></tbody>
         </table>
         <div class="pagination" id="logs-pagination"></div>
+      </div>
+    </div>
+
+<!-- Repair Panel (User) -->
+    <div class="panel" id="panel-repair">
+      <div class="panel-header"><h2>电脑报修</h2></div>
+      <div class="card">
+        <div class="card-title">提交报修</div>
+        <div id="repair-status-info" style="padding:12px;background:#f0f9ff;border-radius:6px;margin-bottom:16px;font-size:13px;color:#4A90D9">
+          加载中...
+        </div>
+        <div id="repair-form-container" style="display:none">
+          <div class="form-group">
+            <label>故障情况描述</label>
+            <textarea id="repair-description" placeholder="请详细描述故障情况..." style="width:100%;min-height:100px;padding:10px 14px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;resize:vertical;outline:none;font-family:inherit"></textarea>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn btn-primary" onclick="submitRepair()">提交报修</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">我的报修记录</div>
+        <table>
+          <thead><tr><th>机器号</th><th>故障描述</th><th>状态</th><th>提交时间</th><th>处理时间</th></tr></thead>
+          <tbody id="repair-my-records"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Repair Admin Panel -->
+    <div class="panel" id="panel-repair-admin">
+      <div class="panel-header">
+        <h2>报修管理</h2>
+        <div style="display:flex;gap:8px">
+          <select id="repair-status-filter" onchange="loadRepairAdmin(1)" style="padding:8px 14px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;outline:none">
+            <option value="">全部状态</option>
+            <option value="0">待处理</option>
+            <option value="1">已处理</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">待处理报修 (<span id="repair-pending-count">0</span>)</div>
+        <table>
+          <thead><tr><th>ID</th><th>提交者</th><th>机器号</th><th>故障情况</th><th>提交时间</th><th>操作</th></tr></thead>
+          <tbody id="repair-pending-table"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">全部报修记录</div>
+        <table>
+          <thead><tr><th>ID</th><th>提交者</th><th>机器号</th><th>故障情况</th><th>状态</th><th>提交时间</th><th>处理时间</th></tr></thead>
+          <tbody id="repair-all-table"></tbody>
+        </table>
+        <div class="pagination" id="repair-pagination"></div>
       </div>
     </div>
 
@@ -1227,7 +1314,20 @@ table tbody tr:hover {
     <div class="form-group"><label>商品名称</label><input type="text" id="snm-name" placeholder="商品名称"></div>
     <div class="form-group"><label>单价（元）</label><input type="number" id="snm-price" min="0" step="0.01" placeholder="单价"></div>
     <div class="form-group"><label>库存</label><input type="number" id="snm-stock" min="0" step="1" value="100"></div>
-    <div class="form-group"><label>图片（Base64/URL，可选）</label><input type="text" id="snm-image" placeholder="图片URL或Base64"></div>
+    <div class="form-group">
+      <label>商品图片</label>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div id="snm-image-preview" style="width:80px;height:80px;border:2px dashed #d9d9d9;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;flex-shrink:0">
+          <span style="color:#bbb;font-size:12px">未选择</span>
+        </div>
+        <div style="flex:1">
+          <input type="file" id="snm-image-file" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" onchange="previewSnackImage(this)" style="display:none">
+          <button type="button" class="btn btn-default btn-sm" onclick="document.getElementById('snm-image-file').click()">选择图片</button>
+          <button type="button" class="btn btn-default btn-sm" onclick="clearSnackImage()" style="margin-left:6px">清除</button>
+          <div style="font-size:12px;color:#999;margin-top:6px">支持 PNG/JPG/GIF/WEBP/BMP，建议尺寸 400x400</div>
+        </div>
+      </div>
+    </div>
     <div class="form-group"><label>状态</label><select id="snm-status"><option value="1">上架</option><option value="0">下架</option></select></div>
     <div class="form-actions">
       <button class="btn btn-primary" onclick="saveSnackProduct()">保存</button>
@@ -1434,6 +1534,8 @@ function switchPanel(panelName, el) {
   else if (panelName === 'snack-admin') loadSnackAdmin();
   else if (panelName === 'snack-shop') loadSnackShop();
   else if (panelName === 'user-center') loadUserCenter();
+  else if (panelName === 'repair') loadRepairUser();
+  else if (panelName === 'repair-admin') loadRepairAdmin(1);
 }
 
 // Dashboard
@@ -1687,6 +1789,16 @@ async function loadOnline() {
 var timerInterval = null;
 function startTimers() {
   if (timerInterval) clearInterval(timerInterval);
+  var serverTimeOffset = 0;
+  if (currentPanel !== 'online') return;
+  var firstTimerEl = document.querySelector('.timer[data-start]');
+  if (firstTimerEl) {
+    var startTime = firstTimerEl.getAttribute('data-start');
+    if (startTime) {
+      var start = new Date(startTime).getTime();
+      serverTimeOffset = Date.now() - start;
+    }
+  }
   function updateTimers() {
     if (currentPanel !== 'online') return;
     document.querySelectorAll('.timer[data-start]').forEach(function(el) {
@@ -1695,6 +1807,7 @@ function startTimers() {
       var start = new Date(startTime).getTime();
       var now = Date.now();
       var diff = Math.floor((now - start) / 1000);
+      if (diff < 0) diff = 0;
       var hours = Math.floor(diff / 3600);
       var mins = Math.floor((diff % 3600) / 60);
       var secs = diff % 60;
@@ -1944,6 +2057,10 @@ async function loadSettings() {
     document.getElementById('settings-base-price').value = config.basePrice || '';
     document.getElementById('settings-peak-price').value = config.peakPrice || '';
     document.getElementById('settings-night-price').value = config.nightPrice || '';
+    document.getElementById('settings-peak-start').value = config.peakStartHour !== undefined ? config.peakStartHour : '';
+    document.getElementById('settings-peak-end').value = config.peakEndHour !== undefined ? config.peakEndHour : '';
+    document.getElementById('settings-night-start').value = config.nightStartHour !== undefined ? config.nightStartHour : '';
+    document.getElementById('settings-night-end').value = config.nightEndHour !== undefined ? config.nightEndHour : '';
 
     var vipData = await apiFetch('/api/vip/levels');
     var levels = vipData.data || vipData || [];
@@ -1977,9 +2094,13 @@ async function saveSettings() {
   var basePrice = parseFloat(document.getElementById('settings-base-price').value);
   var peakPrice = parseFloat(document.getElementById('settings-peak-price').value);
   var nightPrice = parseFloat(document.getElementById('settings-night-price').value);
+  var peakStart = document.getElementById('settings-peak-start').value;
+  var peakEnd = document.getElementById('settings-peak-end').value;
+  var nightStart = document.getElementById('settings-night-start').value;
+  var nightEnd = document.getElementById('settings-night-end').value;
 
-  if (isNaN(basePrice) && isNaN(peakPrice) && isNaN(nightPrice)) {
-    showToast('请至少填写一项价格设置', 'error');
+  if (isNaN(basePrice) && isNaN(peakPrice) && isNaN(nightPrice) && !peakStart && !peakEnd && !nightStart && !nightEnd) {
+    showToast('请至少填写一项设置', 'error');
     return;
   }
 
@@ -1989,6 +2110,10 @@ async function saveSettings() {
     if (!isNaN(basePrice)) body.basePrice = basePrice;
     if (!isNaN(peakPrice)) body.peakPrice = peakPrice;
     if (!isNaN(nightPrice)) body.nightPrice = nightPrice;
+    if (peakStart) body.peakStartHour = parseInt(peakStart);
+    if (peakEnd) body.peakEndHour = parseInt(peakEnd);
+    if (nightStart) body.nightStartHour = parseInt(nightStart);
+    if (nightEnd) body.nightEndHour = parseInt(nightEnd);
     await apiFetch('/api/config', { method: 'PUT', body: JSON.stringify(body) });
     showToast('设置保存成功', 'success');
     loadSettings();
@@ -2323,6 +2448,24 @@ async function changeUserPassword() {
 
 // Snack Shop
 var snackEditingId = null;
+var snackPendingImageFile = null;
+
+function previewSnackImage(input) {
+  if (input.files && input.files[0]) {
+    snackPendingImageFile = input.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('snm-image-preview').innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function clearSnackImage() {
+  snackPendingImageFile = null;
+  document.getElementById('snm-image-file').value = '';
+  document.getElementById('snm-image-preview').innerHTML = '<span style="color:#bbb;font-size:12px">未选择</span>';
+}
 
 async function loadSnackAdmin() {
   showLoading();
@@ -2443,12 +2586,14 @@ function renderSnackShopGrid(products) {
 
 function openSnackProductModal(id) {
   snackEditingId = id || null;
+  snackPendingImageFile = null;
   document.getElementById('snack-modal-title').textContent = id ? '编辑商品' : '添加商品';
   document.getElementById('snm-name').value = '';
   document.getElementById('snm-price').value = '';
   document.getElementById('snm-stock').value = '100';
-  document.getElementById('snm-image').value = '';
+  document.getElementById('snm-image-file').value = '';
   document.getElementById('snm-status').value = '1';
+  document.getElementById('snm-image-preview').innerHTML = '<span style="color:#bbb;font-size:12px">未选择</span>';
 
   if (id) {
     showLoading();
@@ -2458,8 +2603,10 @@ function openSnackProductModal(id) {
         document.getElementById('snm-name').value = p.name || '';
         document.getElementById('snm-price').value = p.price || '';
         document.getElementById('snm-stock').value = p.stock || 100;
-        document.getElementById('snm-image').value = p.image || '';
         document.getElementById('snm-status').value = p.status !== undefined ? p.status : 1;
+        if (p.image) {
+          document.getElementById('snm-image-preview').innerHTML = '<img src="' + p.image + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\'<span style=color:#bbb;font-size:12px>图片加载失败</span>\'">';
+        }
       }
       hideLoading();
     }).catch(function(e) {
@@ -2480,7 +2627,6 @@ async function saveSnackProduct() {
   var name = document.getElementById('snm-name').value.trim();
   var price = parseFloat(document.getElementById('snm-price').value);
   var stock = parseInt(document.getElementById('snm-stock').value) || 0;
-  var image = document.getElementById('snm-image').value.trim();
   var status = parseInt(document.getElementById('snm-status').value);
 
   if (!name) { showToast('请输入商品名称', 'error'); return; }
@@ -2488,7 +2634,22 @@ async function saveSnackProduct() {
 
   showLoading();
   try {
-    var body = { name: name, price: price, stock: stock, image: image, status: status };
+    var imageUrl = '';
+    if (snackPendingImageFile) {
+      var formData = new FormData();
+      formData.append('file', snackPendingImageFile);
+      var uploadResp = await fetch('/api/upload/snack-image', {
+        method: 'POST',
+        headers: { 'Authorization': sessionToken ? 'Bearer ' + sessionToken : '' },
+        body: formData
+      });
+      var uploadData = await uploadResp.json();
+      if (uploadData.data && uploadData.data.url) {
+        imageUrl = uploadData.data.url;
+      }
+    }
+
+    var body = { name: name, price: price, stock: stock, image: imageUrl, status: status };
     if (snackEditingId) {
       await apiFetch('/api/snacks/products/' + snackEditingId, { method: 'PUT', body: JSON.stringify(body) });
       showToast('商品更新成功', 'success');
@@ -2561,6 +2722,134 @@ async function cancelSnackOrder(orderId) {
     loadSnackAdmin();
   } catch (e) {
     showToast('取消失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// Repair
+async function loadRepairUser() {
+  showLoading();
+  try {
+    var statusEl = document.getElementById('repair-status-info');
+    var formContainer = document.getElementById('repair-form-container');
+    var statusData = await apiFetch('/api/user/online-status');
+    if (statusData && statusData.online) {
+      statusEl.innerHTML = '<span style="font-weight:600;color:#27ae60">当前正在上机</span>，机器号：<b>' + (statusData.machineNo || '-') + '</b>';
+      formContainer.style.display = 'block';
+    } else {
+      statusEl.innerHTML = '<span style="color:#999">您当前未上机，无法提交报修</span>';
+      formContainer.style.display = 'none';
+    }
+    document.getElementById('repair-description').value = '';
+    var records = await apiFetch('/api/repair');
+    var list = records.data || records || [];
+    if (!Array.isArray(list)) list = list.records || list.list || [];
+    var html = '';
+    if (list.length === 0) {
+      html = '<tr><td colspan="5" class="empty-state">暂无报修记录</td></tr>';
+    } else {
+      list.forEach(function(r) {
+        html += '<tr>';
+        html += '<td>' + (r.machineNo || '') + '</td>';
+        html += '<td>' + (r.description || '') + '</td>';
+        html += '<td>' + (r.status === 0 ? '<span style="color:#E74C3C">待处理</span>' : '<span style="color:#27AE60">已处理</span>') + '</td>';
+        html += '<td>' + (r.createTime || '') + '</td>';
+        html += '<td>' + (r.handleTime || '-') + '</td>';
+        html += '</tr>';
+      });
+    }
+    document.getElementById('repair-my-records').innerHTML = html;
+  } catch (e) {
+    showToast('加载报修数据失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function submitRepair() {
+  var desc = document.getElementById('repair-description').value.trim();
+  if (!desc) { showToast('请填写故障情况描述', 'error'); return; }
+  showLoading();
+  try {
+    await apiFetch('/api/repair', {
+      method: 'POST',
+      body: JSON.stringify({ description: desc })
+    });
+    showToast('报修提交成功', 'success');
+    loadRepairUser();
+  } catch (e) {
+    showToast('提交失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+var repairAdminPage = 1;
+var repairAdminPageSize = 15;
+
+async function loadRepairAdmin(page) {
+  repairAdminPage = page || repairAdminPage;
+  showLoading();
+  try {
+    var pendingCountData = await apiFetch('/api/repair/pending-count');
+    document.getElementById('repair-pending-count').textContent = pendingCountData.data || pendingCountData || 0;
+    var statusFilter = document.getElementById('repair-status-filter').value;
+    var allResp = await apiFetch('/api/repair');
+    var allList = allResp.data || allResp || [];
+    if (!Array.isArray(allList)) allList = allList.records || allList.list || [];
+    if (statusFilter) {
+      allList = allList.filter(function(r) { return r.status == statusFilter; });
+    }
+    var pendingHtml = '';
+    var pendingList = allList.filter(function(r) { return r.status === 0; });
+    if (pendingList.length === 0) {
+      pendingHtml = '<tr><td colspan="6" class="empty-state">暂无待处理报修</td></tr>';
+    } else {
+      pendingList.forEach(function(r) {
+        pendingHtml += '<tr>';
+        pendingHtml += '<td>' + (r.id || '') + '</td>';
+        pendingHtml += '<td>' + (r.username || '') + '</td>';
+        pendingHtml += '<td>' + (r.machineNo || '') + '</td>';
+        pendingHtml += '<td>' + (r.description || '') + '</td>';
+        pendingHtml += '<td>' + (r.createTime || '') + '</td>';
+        pendingHtml += '<td><button class="btn btn-success btn-sm" onclick="markRepairDone(' + (r.id || 0) + ')">标记已处理</button></td>';
+        pendingHtml += '</tr>';
+      });
+    }
+    document.getElementById('repair-pending-table').innerHTML = pendingHtml;
+    var allHtml = '';
+    if (allList.length === 0) {
+      allHtml = '<tr><td colspan="7" class="empty-state">暂无报修记录</td></tr>';
+    } else {
+      allList.forEach(function(r) {
+        allHtml += '<tr>';
+        allHtml += '<td>' + (r.id || '') + '</td>';
+        allHtml += '<td>' + (r.username || '') + '</td>';
+        allHtml += '<td>' + (r.machineNo || '') + '</td>';
+        allHtml += '<td>' + (r.description || '') + '</td>';
+        allHtml += '<td>' + (r.status === 0 ? '<span style="color:#E74C3C">待处理</span>' : '<span style="color:#27AE60">已处理</span>') + '</td>';
+        allHtml += '<td>' + (r.createTime || '') + '</td>';
+        allHtml += '<td>' + (r.handleTime || '-') + '</td>';
+        allHtml += '</tr>';
+      });
+    }
+    document.getElementById('repair-all-table').innerHTML = allHtml;
+  } catch (e) {
+    showToast('加载报修管理失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function markRepairDone(id) {
+  showLoading();
+  try {
+    await apiFetch('/api/repair/' + id + '/done', { method: 'PUT' });
+    showToast('已标记为已处理', 'success');
+    loadRepairAdmin(1);
+  } catch (e) {
+    showToast('操作失败: ' + e.message, 'error');
   } finally {
     hideLoading();
   }

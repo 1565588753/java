@@ -304,21 +304,70 @@ public class ChargeService {
 
     /**
      * 根据当前时间获取对应时段的基础单价
-     * 深夜时段 00:00-08:00 → 3元/小时
-     * 普通时段 08:00-18:00 → 5元/小时
-     * 高峰时段 18:00-24:00 → 8元/小时
+     * 时段范围由 system_config 表配置，支持管理员自定义
      */
     private BigDecimal getCurrentTimePrice() {
         Calendar cal = Calendar.getInstance();
         int hour = cal.get(Calendar.HOUR_OF_DAY);
 
-        if (hour >= 0 && hour < 8) {
-            return getNightPrice();
-        } else if (hour >= 18 && hour < 24) {
-            return getPeakPrice();
+        int peakStart = getPeakStartHour();
+        int peakEnd = getPeakEndHour();
+        int nightStart = getNightStartHour();
+        int nightEnd = getNightEndHour();
+
+        if (peakStart <= peakEnd) {
+            if (hour >= peakStart && hour <= peakEnd) {
+                return getPeakPrice();
+            }
         } else {
-            return getBasePrice();
+            if (hour >= peakStart || hour <= peakEnd) {
+                return getPeakPrice();
+            }
         }
+
+        if (nightStart <= nightEnd) {
+            if (hour >= nightStart && hour <= nightEnd) {
+                return getNightPrice();
+            }
+        } else {
+            if (hour >= nightStart || hour <= nightEnd) {
+                return getNightPrice();
+            }
+        }
+
+        return getBasePrice();
+    }
+
+    public int getPeakStartHour() {
+        String value = systemConfigDao.getConfig("peak_start_hour");
+        if (value != null) {
+            try { return Integer.parseInt(value); } catch (NumberFormatException e) {}
+        }
+        return 18;
+    }
+
+    public int getPeakEndHour() {
+        String value = systemConfigDao.getConfig("peak_end_hour");
+        if (value != null) {
+            try { return Integer.parseInt(value); } catch (NumberFormatException e) {}
+        }
+        return 23;
+    }
+
+    public int getNightStartHour() {
+        String value = systemConfigDao.getConfig("night_start_hour");
+        if (value != null) {
+            try { return Integer.parseInt(value); } catch (NumberFormatException e) {}
+        }
+        return 0;
+    }
+
+    public int getNightEndHour() {
+        String value = systemConfigDao.getConfig("night_end_hour");
+        if (value != null) {
+            try { return Integer.parseInt(value); } catch (NumberFormatException e) {}
+        }
+        return 7;
     }
 
     public BigDecimal getBasePrice() {
