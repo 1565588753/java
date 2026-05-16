@@ -158,11 +158,4 @@ public class RepairController extends BaseController implements HttpHandler {
         sendJson(exchange, response);
     }
 
-    private User getUserSession(HttpExchange exchange) {
-        Object userObj = exchange.getAttribute("user");
-        if (userObj instanceof User) {
-            return (User) userObj;
-        }
-        return null;
     }
-}
