@@ -255,12 +255,12 @@ public class ChargeController extends BaseController implements HttpHandler {
      * @throws IOException 当发送响应时发生I/O错误
      */
     private void handleActiveRecords(HttpExchange exchange) throws IOException {
-        /* 调用服务层获取所有活跃上机记录 */
         List<OnlineRecord> records = chargeService.getActiveRecords();
 
         Map<String, Object> response = new HashMap<>();
         response.put("list", records);
         response.put("total", records.size());
+        response.put("serverTime", com.internetcafe.util.DateUtil.getCurrentDateTime());
 
         sendJson(exchange, response);
     }

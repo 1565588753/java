@@ -1713,14 +1713,19 @@ async function deleteUser(userId) {
 }
 
 // Online
+var serverTimeOffset = 0;
 async function loadOnline() {
   showLoading();
   try {
     var activeData = await apiFetch('/api/charge/active');
     var historyData = await apiFetch('/api/charge/history?page=1&pageSize=10');
 
+    if (activeData.serverTime) {
+      serverTimeOffset = Date.now() - new Date(activeData.serverTime).getTime();
+    }
+
     var activeList = activeData.data || activeData || [];
-    if (!Array.isArray(activeList)) activeList = activeList.records || activeList.list || [];
+    if (!Array.isArray(activeList)) activeList = activeData.records || activeData.list || [];
 
     var activeTbody = document.getElementById('active-sessions-table');
     var activeEmpty = document.getElementById('active-sessions-empty');
@@ -1775,24 +1780,15 @@ async function loadOnline() {
 var timerInterval = null;
 function startTimers() {
   if (timerInterval) clearInterval(timerInterval);
-  var serverTimeOffset = 0;
   if (currentPanel !== 'online') return;
-  var firstTimerEl = document.querySelector('.timer[data-start]');
-  if (firstTimerEl) {
-    var startTime = firstTimerEl.getAttribute('data-start');
-    if (startTime) {
-      var start = new Date(startTime).getTime();
-      serverTimeOffset = Date.now() - start;
-    }
-  }
   function updateTimers() {
     if (currentPanel !== 'online') return;
+    var serverNow = Date.now() - serverTimeOffset;
     document.querySelectorAll('.timer[data-start]').forEach(function(el) {
       var startTime = el.getAttribute('data-start');
       if (!startTime) return;
       var start = new Date(startTime).getTime();
-      var now = Date.now();
-      var diff = Math.floor((now - start) / 1000);
+      var diff = Math.floor((serverNow - start) / 1000);
       if (diff < 0) diff = 0;
       var hours = Math.floor(diff / 3600);
       var mins = Math.floor((diff % 3600) / 60);
