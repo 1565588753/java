@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1400" height="1600" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Microsoft YaHei', sans-serif;">
+
+<!-- 白色背景 -->
+<rect width="1400" height="1600" fill="white"/>
+
+<!-- 标题 -->
+<text x="700" y="35" text-anchor="middle" font-size="22" font-weight="bold">网吧计费管理系统数据库E-R图</text>
+
+<!-- ==================== 用户实体 (左侧中间) ==================== -->
+<!-- 用户实体矩形 -->
+<rect x="30" y="600" width="120" height="45" fill="#e3f2fd" stroke="#1565c0" stroke-width="2" rx="3"/>
+<text x="90" y="628" text-anchor="middle" font-size="15" font-weight="bold">用户</text>
+
+<!-- 用户属性 - 上侧 -->
+<ellipse cx="60" cy="540" rx="38" ry="20" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="60" y="544" text-anchor="middle" font-size="12">用户ID(PK)</text>
+<line x1="70" y1="562" x2="80" y2="600" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="125" cy="525" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="125" y="529" text-anchor="middle" font-size="12">用户名</text>
+<line x1="110" y1="543" x2="80" y2="600" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="180" cy="540" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="180" y="544" text-anchor="middle" font-size="12">密码</text>
+<line x1="150" y1="556" x2="90" y2="600" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="225" cy="570" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="225" y="574" text-anchor="middle" font-size="12">真实姓名</text>
+<line x1="200" y1="588" x2="105" y2="600" stroke="#333" stroke-width="1.5"/>
+
+<!-- 用户属性 - 右侧 -->
+<ellipse cx="245" cy="610" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="245" y="614" text-anchor="middle" font-size="12">身份证号</text>
+<line x1="213" y1="620" x2="150" y2="622" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="255" cy="655" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="255" y="659" text-anchor="middle" font-size="12">手机号</text>
+<line x1="225" y1="648" x2="150" y2="635" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="235" cy="700" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="235" y="704" text-anchor="middle" font-size="12">余额</text>
+<line x1="205" y1="695" x2="140" y2="645" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="200" cy="735" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="200" y="739" text-anchor="middle" font-size="12">积分</text>
+<line x1="175" y1="725" x2="120" y2="645" stroke="#333" stroke-width="1.5"/>
+
+<!-- 用户属性 - 左侧 -->
+<ellipse cx="40" cy="660" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="40" y="664" text-anchor="middle" font-size="12">会员等级</text>
+<line x1="60" y1="650" x2="80" y2="645" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="25" cy="710" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="25" y="714" text-anchor="middle" font-size="12">状态</text>
+<line x1="48" y1="698" x2="75" y2="645" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="30" cy="760" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="30" y="764" text-anchor="middle" font-size="12">创建时间</text>
+<line x1="55" y1="745" x2="80" y2="645" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 管理员实体 (左上) ==================== -->
+<rect x="30" y="100" width="120" height="45" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="3"/>
+<text x="90" y="128" text-anchor="middle" font-size="15" font-weight="bold">管理员</text>
+
+<ellipse cx="60" cy="45" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="60" y="49" text-anchor="middle" font-size="12">管理员ID(PK)</text>
+<line x1="70" y1="63" x2="80" y2="100" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="140" cy="40" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="140" y="44" text-anchor="middle" font-size="12">用户名</text>
+<line x1="115" y1="55" x2="90" y2="100" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="180" cy="75" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="180" y="79" text-anchor="middle" font-size="12">密码</text>
+<line x1="155" y1="85" x2="100" y2="100" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="40" cy="155" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="40" y="159" text-anchor="middle" font-size="12">角色</text>
+<line x1="60" y1="145" x2="80" y2="145" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="35" cy="205" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="35" y="209" text-anchor="middle" font-size="12">创建时间</text>
+<line x1="60" y1="190" x2="90" y2="145" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 会员等级实体 (左下) ==================== -->
+<rect x="30" y="1150" width="120" height="45" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2" rx="3"/>
+<text x="90" y="1178" text-anchor="middle" font-size="15" font-weight="bold">会员等级</text>
+
+<ellipse cx="60" cy="1095" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="60" y="1099" text-anchor="middle" font-size="12">等级ID(PK)</text>
+<line x1="70" y1="1113" x2="80" y2="1150" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="135" cy="1085" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="135" y="1089" text-anchor="middle" font-size="12">等级名称</text>
+<line x1="115" y1="1103" x2="90" y2="1150" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="180" cy="1125" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="180" y="1129" text-anchor="middle" font-size="12">折扣率</text>
+<line x1="155" y1="1135" x2="100" y2="1160" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="40" cy="1210" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="40" y="1214" text-anchor="middle" font-size="12">描述</text>
+<line x1="60" y1="1195" x2="80" y2="1195" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 上机记录实体 (中间偏上) ==================== -->
+<rect x="400" y="80" width="120" height="45" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="3"/>
+<text x="460" y="108" text-anchor="middle" font-size="15" font-weight="bold">上机记录</text>
+
+<ellipse cx="430" cy="30" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="430" y="34" text-anchor="middle" font-size="12">记录ID(PK)</text>
+<line x1="440" y1="48" x2="450" y2="80" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="505" cy="30" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="505" y="34" text-anchor="middle" font-size="12">用户ID(FK)</text>
+<line x1="485" y1="45" x2="470" y2="80" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="560" cy="55" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="560" y="59" text-anchor="middle" font-size="12">上机时间</text>
+<line x1="535" y1="68" x2="470" y2="90" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="570" cy="105" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="570" y="109" text-anchor="middle" font-size="12">下机时间</text>
+<line x1="540" y1="100" x2="470" y2="105" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="565" cy="155" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="565" y="159" text-anchor="middle" font-size="12">时长(分)</text>
+<line x1="540" y1="148" x2="470" y2="125" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="540" cy="200" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="540" y="204" text-anchor="middle" font-size="12">消费金额</text>
+<line x1="515" y1="190" x2="470" y2="125" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="495" cy="230" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="495" y="234" text-anchor="middle" font-size="12">机器号</text>
+<line x1="480" y1="218" x2="460" y2="125" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="440" cy="235" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="440" y="239" text-anchor="middle" font-size="12">状态</text>
+<line x1="445" y1="220" x2="455" y2="125" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 充值记录实体 (中右) ==================== -->
+<rect x="680" y="80" width="120" height="45" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="3"/>
+<text x="740" y="108" text-anchor="middle" font-size="15" font-weight="bold">充值记录</text>
+
+<ellipse cx="710" cy="30" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="710" y="34" text-anchor="middle" font-size="12">记录ID(PK)</text>
+<line x1="720" y1="48" x2="730" y2="80" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="785" cy="30" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="785" y="34" text-anchor="middle" font-size="12">用户ID(FK)</text>
+<line x1="765" y1="45" x2="750" y2="80" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="830" cy="55" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="830" y="59" text-anchor="middle" font-size="12">金额</text>
+<line x1="810" y1="68" x2="750" y2="95" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="840" cy="105" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="840" y="109" text-anchor="middle" font-size="12">充值时间</text>
+<line x1="810" y1="100" x2="750" y2="105" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="830" cy="155" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="830" y="159" text-anchor="middle" font-size="12">操作员</text>
+<line x1="810" y1="148" x2="750" y2="125" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 消费记录实体 (中下) ==================== -->
+<rect x="680" y="260" width="120" height="45" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="3"/>
+<text x="740" y="288" text-anchor="middle" font-size="15" font-weight="bold">消费记录</text>
+
+<ellipse cx="710" cy="210" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="710" y="214" text-anchor="middle" font-size="12">记录ID(PK)</text>
+<line x1="720" y1="228" x2="730" y2="260" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="785" cy="210" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="785" y="214" text-anchor="middle" font-size="12">用户ID(FK)</text>
+<line x1="765" y1="225" x2="750" y2="260" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="830" cy="235" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="830" y="239" text-anchor="middle" font-size="12">金额</text>
+<line x1="810" y1="248" x2="750" y2="275" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="840" cy="285" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="840" y="289" text-anchor="middle" font-size="12">消费类型</text>
+<line x1="810" y1="280" x2="750" y2="285" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="830" cy="335" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="830" y="339" text-anchor="middle" font-size="12">消费时间</text>
+<line x1="810" y1="328" x2="750" y2="305" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 系统日志实体 (中下) ==================== -->
+<rect x="680" y="440" width="120" height="45" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="3"/>
+<text x="740" y="468" text-anchor="middle" font-size="15" font-weight="bold">系统日志</text>
+
+<ellipse cx="710" cy="390" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="710" y="394" text-anchor="middle" font-size="12">日志ID(PK)</text>
+<line x1="720" y1="408" x2="730" y2="440" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="785" cy="390" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="785" y="394" text-anchor="middle" font-size="12">操作人</text>
+<line x1="765" y1="405" x2="750" y2="440" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="830" cy="415" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="830" y="419" text-anchor="middle" font-size="12">操作类型</text>
+<line x1="810" y1="428" x2="750" y2="455" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="840" cy="465" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="840" y="469" text-anchor="middle" font-size="12">操作内容</text>
+<line x1="810" y1="460" x2="750" y2="465" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="830" cy="515" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="830" y="519" text-anchor="middle" font-size="12">操作时间</text>
+<line x1="810" y1="508" x2="750" y2="485" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 系统配置实体 (右下) ==================== -->
+<rect x="680" y="600" width="120" height="45" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="3"/>
+<text x="740" y="628" text-anchor="middle" font-size="15" font-weight="bold">系统配置</text>
+
+<ellipse cx="710" cy="550" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="710" y="554" text-anchor="middle" font-size="12">配置ID(PK)</text>
+<line x1="720" y1="568" x2="730" y2="600" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="785" cy="550" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="785" y="554" text-anchor="middle" font-size="12">配置键</text>
+<line x1="765" y1="565" x2="750" y2="600" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="830" cy="575" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="830" y="579" text-anchor="middle" font-size="12">配置值</text>
+<line x1="810" y1="588" x2="750" y2="615" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="840" cy="625" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="840" y="629" text-anchor="middle" font-size="12">描述</text>
+<line x1="810" y1="620" x2="750" y2="625" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="830" cy="675" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="830" y="679" text-anchor="middle" font-size="12">更新时间</text>
+<line x1="810" y1="668" x2="750" y2="645" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 零食商品实体 (右上) ==================== -->
+<rect x="1000" y="80" width="120" height="45" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="3"/>
+<text x="1060" y="108" text-anchor="middle" font-size="15" font-weight="bold">零食商品</text>
+
+<ellipse cx="1030" cy="30" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1030" y="34" text-anchor="middle" font-size="12">商品ID(PK)</text>
+<line x1="1040" y1="48" x2="1050" y2="80" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1105" cy="30" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1105" y="34" text-anchor="middle" font-size="12">名称</text>
+<line x1="1085" y1="45" x2="1070" y2="80" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1150" cy="55" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1150" y="59" text-anchor="middle" font-size="12">价格</text>
+<line x1="1130" y1="68" x2="1070" y2="95" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1160" cy="105" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1160" y="109" text-anchor="middle" font-size="12">图片</text>
+<line x1="1130" y1="100" x2="1070" y2="105" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1150" cy="155" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1150" y="159" text-anchor="middle" font-size="12">库存</text>
+<line x1="1130" y1="148" x2="1070" y2="125" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1125" cy="200" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1125" y="204" text-anchor="middle" font-size="12">状态</text>
+<line x1="1100" y1="190" x2="1070" y2="125" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1080" cy="230" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1080" y="234" text-anchor="middle" font-size="12">创建时间</text>
+<line x1="1060" y1="218" x2="1060" y2="125" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1040" cy="235" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1040" y="239" text-anchor="middle" font-size="12">更新时间</text>
+<line x1="1045" y1="220" x2="1055" y2="125" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 零食订单实体 (右中) ==================== -->
+<rect x="1000" y="350" width="120" height="45" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="3"/>
+<text x="1060" y="378" text-anchor="middle" font-size="15" font-weight="bold">零食订单</text>
+
+<ellipse cx="1030" cy="300" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1030" y="304" text-anchor="middle" font-size="12">订单ID(PK)</text>
+<line x1="1040" y1="318" x2="1050" y2="350" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1105" cy="300" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1105" y="304" text-anchor="middle" font-size="12">用户ID(FK)</text>
+<line x1="1085" y1="315" x2="1070" y2="350" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1150" cy="325" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1150" y="329" text-anchor="middle" font-size="12">商品ID(FK)</text>
+<line x1="1130" y1="338" x2="1070" y2="365" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1160" cy="375" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1160" y="379" text-anchor="middle" font-size="12">商品名称</text>
+<line x1="1130" y1="370" x2="1070" y2="375" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1150" cy="425" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1150" y="429" text-anchor="middle" font-size="12">数量</text>
+<line x1="1130" y1="418" x2="1070" y2="395" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1125" cy="470" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1125" y="474" text-anchor="middle" font-size="12">单价</text>
+<line x1="1100" y1="460" x2="1070" y2="395" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1080" cy="500" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1080" y="504" text-anchor="middle" font-size="12">总价</text>
+<line x1="1060" y1="488" x2="1060" y2="395" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1040" cy="505" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1040" y="509" text-anchor="middle" font-size="12">状态</text>
+<line x1="1045" y1="490" x2="1055" y2="395" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1000" cy="480" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1000" y="484" text-anchor="middle" font-size="12">下单时间</text>
+<line x1="1025" y1="470" x2="1050" y2="395" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 报修实体 (右下) ==================== -->
+<rect x="1000" y="600" width="120" height="45" fill="#fff8e1" stroke="#f57f17" stroke-width="2" rx="3"/>
+<text x="1060" y="628" text-anchor="middle" font-size="15" font-weight="bold">报修</text>
+
+<ellipse cx="1030" cy="550" rx="38" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1030" y="554" text-anchor="middle" font-size="12">报修ID(PK)</text>
+<line x1="1040" y1="568" x2="1050" y2="600" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1105" cy="550" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1105" y="554" text-anchor="middle" font-size="12">用户ID(FK)</text>
+<line x1="1085" y1="565" x2="1070" y2="600" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1150" cy="575" rx="32" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1150" y="579" text-anchor="middle" font-size="12">用户名</text>
+<line x1="1130" y1="588" x2="1070" y2="615" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1160" cy="625" rx="30" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1160" y="629" text-anchor="middle" font-size="12">机器号</text>
+<line x1="1130" y1="620" x2="1070" y2="625" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1150" cy="675" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1150" y="679" text-anchor="middle" font-size="12">故障描述</text>
+<line x1="1130" y1="668" x2="1070" y2="645" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1125" cy="720" rx="28" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1125" y="724" text-anchor="middle" font-size="12">状态</text>
+<line x1="1100" y1="710" x2="1070" y2="645" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1080" cy="750" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1080" y="754" text-anchor="middle" font-size="12">报修时间</text>
+<line x1="1060" y1="738" x2="1060" y2="645" stroke="#333" stroke-width="1.5"/>
+
+<ellipse cx="1040" cy="755" rx="35" ry="18" fill="white" stroke="#333" stroke-width="1.5"/>
+<text x="1040" y="759" text-anchor="middle" font-size="12">处理时间</text>
+<line x1="1045" y1="740" x2="1055" y2="645" stroke="#333" stroke-width="1.5"/>
+
+
+<!-- ==================== 联系 (菱形) ==================== -->
+
+<!-- 会员等级 - 属于 - 用户 -->
+<line x1="150" y1="645" x2="150" y2="800" stroke="#333" stroke-width="1.5"/>
+<polygon points="120,800 150,780 180,800 150,820" fill="#fff9c4" stroke="#333" stroke-width="1.5"/>
+<text x="150" y="805" text-anchor="middle" font-size="13">属于</text>
+<text x="125" y="780" font-size="12">N</text>
+<text x="165" y="835" font-size="12">1</text>
+<line x1="150" y1="820" x2="150" y2="1150" stroke="#333" stroke-width="1.5"/>
+
+<!-- 用户 - 拥有 - 上机记录 -->
+<polygon points="280,200 310,180 340,200 310,220" fill="#fff9c4" stroke="#333" stroke-width="1.5"/>
+<text x="310" y="205" text-anchor="middle" font-size="13">拥有</text>
+<text x="265" y="200" font-size="12">1</text>
+<text x="345" y="190" font-size="12">N</text>
+<line x1="250" y1="390" x2="290" y2="210" stroke="#333" stroke-width="1.5"/>
+<line x1="330" y1="200" x2="400" y2="125" stroke="#333" stroke-width="1.5"/>
+
+<!-- 用户 - 拥有 - 充值记录 -->
+<polygon points="400,300 430,280 460,300 430,320" fill="#fff9c4" stroke="#333" stroke-width="1.5"/>
+<text x="430" y="305" text-anchor="middle" font-size="13">拥有</text>
+<text x="385" y="300" font-size="12">1</text>
+<text x="465" y="290" font-size="12">N</text>
+<line x1="250" y1="400" x2="410" y2="300" stroke="#333" stroke-width="1.5"/>
+<line x1="450" y1="310" x2="680" y2="125" stroke="#333" stroke-width="1.5"/>
+
+<!-- 用户 - 拥有 - 消费记录 -->
+<polygon points="380,420 410,400 440,420 410,440" fill="#fff9c4" stroke="#333" stroke-width="1.5"/>
+<text x="410" y="425" text-anchor="middle" font-size="13">拥有</text>
+<text x="365" y="420" font-size="12">1</text>
+<text x="445" y="410" font-size="12">N</text>
+<line x1="250" y1="420" x2="390" y2="420" stroke="#333" stroke-width="1.5"/>
+<line x1="430" y1="430" x2="680" y2="305" stroke="#333" stroke-width="1.5"/>
+
+<!-- 用户 - 购买 - 零食订单 -->
+<polygon points="550,420 580,400 610,420 580,440" fill="#fff9c4" stroke="#333" stroke-width="1.5"/>
+<text x="580" y="425" text-anchor="middle" font-size="13">购买</text>
+<text x="535" y="420" font-size="12">1</text>
+<text x="615" y="410" font-size="12">N</text>
+<line x1="250" y1="430" x2="560" y2="420" stroke="#333" stroke-width="1.5"/>
+<line x1="600" y1="430" x2="1000" y2="375" stroke="#333" stroke-width="1.5"/>
+
+<!-- 用户 - 提交 - 报修 -->
+<polygon points="450,550 480,530 510,550 480,570" fill="#fff9c4" stroke="#333" stroke-width="1.5"/>
+<text x="480" y="555" text-anchor="middle" font-size="13">提交</text>
+<text x="435" y="550" font-size="12">1</text>
+<text x="515" y="540" font-size="12">N</text>
+<line x1="250" y1="440" x2="460" y2="550" stroke="#333" stroke-width="1.5"/>
+<line x1="500" y1="560" x2="1000" y2="625" stroke="#333" stroke-width="1.5"/>
+
+<!-- 零食商品 - 组成 - 零食订单 -->
+<polygon points="850,220 880,200 910,220 880,240" fill="#fff9c4" stroke="#333" stroke-width="1.5"/>
+<text x="880" y="225" text-anchor="middle" font-size="13">组成</text>
+<text x="835" y="220" font-size="12">1</text>
+<text x="915" y="210" font-size="12">N</text>
+<line x1="910" y1="220" x2="1000" y2="375" stroke="#333" stroke-width="1.5"/>
+<line x1="850" y1="215" x2="1120" y2="125" stroke="#333" stroke-width="1.5"/>
+
+<!-- 图例 -->
+<rect x="1150" y="1400" width="200" height="140" fill="#f5f5f5" stroke="#999" stroke-width="1" rx="5"/>
+<text x="1250" y="1425" text-anchor="middle" font-size="14" font-weight="bold">图例</text>
+<rect x="1170" y="1440" width="20" height="15" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="1200" y="1452" font-size="12">核心实体</text>
+<rect x="1170" y="1460" width="20" height="15" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+<text x="1200" y="1472" font-size="12">业务记录</text>
+<rect x="1170" y="1480" width="20" height="15" fill="#fce4ec" stroke="#c62828" stroke-width="1.5"/>
+<text x="1200" y="1492" font-size="12">辅助配置</text>
+<rect x="1170" y="1500" width="20" height="15" fill="#e0f2f1" stroke="#00695c" stroke-width="1.5"/>
+<text x="1200" y="1512" font-size="12">零食模块</text>
+<rect x="1170" y="1520" width="20" height="15" fill="#fff8e1" stroke="#f57f17" stroke-width="1.5"/>
+<text x="1200" y="1532" font-size="12">报修模块</text>
+
+</svg>
