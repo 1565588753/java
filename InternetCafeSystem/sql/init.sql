@@ -159,7 +159,7 @@ INSERT INTO user (username, password, real_name, id_card, phone, balance, vip_le
 ('test003', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '王五', '110101199003031236', '13800138003', 50.00, 1, 50, 1);
 
 -- ==========================================
--- 8. 零食商品表 snack_product
+-- 9. 零食商品表 snack_product
 -- ==========================================
 DROP TABLE IF EXISTS snack_product;
 CREATE TABLE snack_product (
@@ -174,7 +174,7 @@ CREATE TABLE snack_product (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================
--- 9. 零食订单表 snack_order
+-- 10. 零食订单表 snack_order
 -- ==========================================
 DROP TABLE IF EXISTS snack_order;
 CREATE TABLE snack_order (

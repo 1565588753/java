@@ -697,7 +697,7 @@ table tbody tr:hover {
       <div class="nav-item admin-only" data-panel="vip" onclick="switchPanel('vip', this)">
         <span class="nav-icon">👑</span><span>会员管理</span>
       </div>
-      <div class="nav-item admin-only" data-panel="settings" onclick="switchPanel('settings', this)">
+<div class="nav-item admin-only" data-panel="settings" onclick="switchPanel('settings', this)">
         <span class="nav-icon">⚙️</span><span>系统设置</span>
       </div>
       <div class="nav-item role-admin-only admin-only" data-panel="reports" onclick="switchPanel('reports', this)">
@@ -948,7 +948,7 @@ table tbody tr:hover {
       </div>
     </div>
 
-    <!-- Settings Panel -->
+<!-- Settings Panel -->
     <div class="panel" id="panel-settings">
       <div class="panel-header"><h2>系统设置</h2></div>
       <div class="card">
@@ -1055,7 +1055,7 @@ table tbody tr:hover {
       </div>
     </div>
 
-    <!-- Snack Admin Panel -->
+<!-- Snack Admin Panel -->
     <div class="panel" id="panel-snack-admin">
       <div class="panel-header"><h2>超市管理</h2><button class="btn btn-primary" onclick="openSnackProductModal()">+ 添加商品</button></div>
       <div class="card">
@@ -1291,7 +1291,7 @@ async function apiFetch(url, options) {
       }
       throw new Error('Unauthorized');
     }
-    var contentType = resp.headers.get('content-type') || '';
+var contentType = resp.headers.get('content-type') || '';
     var data;
     if (contentType.indexOf('application/json') !== -1) {
       data = await resp.json();
@@ -2236,7 +2236,7 @@ async function loadUserCenter() {
       document.getElementById('up-username').textContent = profile.username || '-';
       document.getElementById('up-realname').textContent = profile.realName || '-';
       document.getElementById('up-balance').textContent = '¥' + (profile.balance || 0).toFixed(2);
-      document.getElementById('up-vip').textContent = profile.vipLevelName || '普通会员';
+document.getElementById('up-vip').textContent = profile.vipLevelName || '普通会员';
       document.getElementById('up-points').textContent = profile.points || 0;
       document.getElementById('up-phone').textContent = profile.phone || '-';
     }
