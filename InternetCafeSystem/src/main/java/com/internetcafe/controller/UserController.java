@@ -114,8 +114,7 @@ public class UserController extends BaseController implements HttpHandler {
 
             sendError(exchange, 404, "接口不存在: " + method + " " + path);
         } catch (Exception e) {
-            e.printStackTrace();
-            sendError(exchange, 500, "服务器内部错误: " + e.getMessage());
+            handleException(exchange, e, "UserController处理请求异常");
         }
     }
 

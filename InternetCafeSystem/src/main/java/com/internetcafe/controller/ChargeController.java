@@ -128,8 +128,7 @@ public class ChargeController extends BaseController implements HttpHandler {
 
             sendError(exchange, 404, "接口不存在: " + method + " " + path);
         } catch (Exception e) {
-            e.printStackTrace();
-            sendError(exchange, 500, "服务器内部错误: " + e.getMessage());
+            handleException(exchange, e, "ChargeController处理请求异常");
         }
     }
 
@@ -256,12 +255,12 @@ public class ChargeController extends BaseController implements HttpHandler {
      * @throws IOException 当发送响应时发生I/O错误
      */
     private void handleActiveRecords(HttpExchange exchange) throws IOException {
-        /* 调用服务层获取所有活跃上机记录 */
         List<OnlineRecord> records = chargeService.getActiveRecords();
 
         Map<String, Object> response = new HashMap<>();
         response.put("list", records);
         response.put("total", records.size());
+        response.put("serverTime", com.internetcafe.util.DateUtil.getCurrentDateTime());
 
         sendJson(exchange, response);
     }

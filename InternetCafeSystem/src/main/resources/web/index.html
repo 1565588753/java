@@ -243,7 +243,7 @@ body {
   margin-left: 220px;
   padding: 24px;
   min-height: 100vh;
-  max-width: 1400px;
+  width: calc(100% - 220px);
 }
 
 .table-wrapper {
@@ -279,7 +279,7 @@ body {
 
 .stat-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -407,7 +407,6 @@ table tbody tr:hover {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
-  max-width: 900px;
 }
 
 .form-actions {
@@ -699,14 +698,29 @@ table tbody tr:hover {
       <div class="nav-item admin-only" data-panel="vip" onclick="switchPanel('vip', this)">
         <span class="nav-icon">👑</span><span>会员管理</span>
       </div>
-      <div class="nav-item role-admin-only admin-only" data-panel="reports" onclick="switchPanel('reports', this)">
-        <span class="nav-icon">📈</span><span>报表统计</span>
+      <div class="nav-item admin-only" data-panel="settings" onclick="switchPanel('settings', this)">
+        <span class="nav-icon">⚙️</span><span>上网单价管理</span>
+      </div>
+      <div class="nav-item admin-only" data-panel="snack-admin" onclick="switchPanel('snack-admin', this)">
+        <span class="nav-icon">🛒</span><span>超市管理</span>
+      </div>
+      <div class="nav-item user-only" data-panel="repair" onclick="switchPanel('repair', this)">
+        <span class="nav-icon">🔧</span><span>报修</span>
+      </div>
+      <div class="nav-item admin-only" data-panel="repair-admin" onclick="switchPanel('repair-admin', this)">
+        <span class="nav-icon">🔧</span><span>报修管理</span>
+      </div>
+      <div class="nav-item user-only" data-panel="user-center" onclick="switchPanel('user-center', this)">
+        <span class="nav-icon">🏠</span><span>个人中心</span>
+      </div>
+      <div class="nav-item user-only" data-panel="snack-shop" onclick="switchPanel('snack-shop', this)">
+        <span class="nav-icon">🍿</span><span>零食超市</span>
       </div>
       <div class="nav-item role-admin-only admin-only" data-panel="logs" onclick="switchPanel('logs', this)">
         <span class="nav-icon">📋</span><span>系统日志</span>
       </div>
-      <div class="nav-item user-only" data-panel="user-center" onclick="switchPanel('user-center', this)">
-        <span class="nav-icon">🏠</span><span>个人中心</span>
+      <div class="nav-item role-admin-only admin-only" data-panel="reports" onclick="switchPanel('reports', this)">
+        <span class="nav-icon">📈</span><span>报表统计</span>
       </div>
       <div class="nav-item logout" onclick="doLogout()">
         <span class="nav-icon">🚪</span><span>退出登录</span>
@@ -941,6 +955,62 @@ table tbody tr:hover {
       </div>
     </div>
 
+<!-- Settings Panel -->
+    <div class="panel" id="panel-settings">
+      <div class="panel-header"><h2>上网单价管理</h2></div>
+      <div class="card">
+        <div class="card-title">时段划分设置</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>高峰期开始时间（小时 0-23）</label>
+            <input type="number" id="settings-peak-start" min="0" max="23" step="1" placeholder="如：18">
+          </div>
+          <div class="form-group">
+            <label>高峰期结束时间（小时 0-23）</label>
+            <input type="number" id="settings-peak-end" min="0" max="23" step="1" placeholder="如：23">
+          </div>
+          <div class="form-group">
+            <label>深夜期开始时间（小时 0-23）</label>
+            <input type="number" id="settings-night-start" min="0" max="23" step="1" placeholder="如：0">
+          </div>
+          <div class="form-group">
+            <label>深夜期结束时间（小时 0-23）</label>
+            <input type="number" id="settings-night-end" min="0" max="23" step="1" placeholder="如：7">
+          </div>
+        </div>
+        <div style="font-size:12px;color:#999;margin-top:8px">
+          说明：高峰期和深夜期以外的时段为普通价格时段。
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">上网费单价设置（VIP等级自动打折）</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>普通时段单价（元/小时）</label>
+            <input type="number" id="settings-base-price" min="0" step="0.1" placeholder="基础单价">
+          </div>
+          <div class="form-group">
+            <label>高峰时段单价（元/小时）</label>
+            <input type="number" id="settings-peak-price" min="0" step="0.1" placeholder="高峰单价">
+          </div>
+          <div class="form-group">
+            <label>深夜时段单价（元/小时）</label>
+            <input type="number" id="settings-night-price" min="0" step="0.1" placeholder="深夜单价">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">VIP折扣预览</div>
+        <table>
+          <thead><tr><th>会员等级</th><th>折扣率</th><th>普通时段实付</th><th>高峰时段实付</th><th>深夜时段实付</th></tr></thead>
+          <tbody id="settings-vip-preview"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Reports Panel -->
     <div class="panel" id="panel-reports">
       <div class="panel-header">
@@ -1013,6 +1083,104 @@ table tbody tr:hover {
           <tbody id="logs-table-body"></tbody>
         </table>
         <div class="pagination" id="logs-pagination"></div>
+      </div>
+    </div>
+
+<!-- Repair Panel (User) -->
+    <div class="panel" id="panel-repair">
+      <div class="panel-header"><h2>电脑报修</h2></div>
+      <div class="card">
+        <div class="card-title">提交报修</div>
+        <div id="repair-status-info" style="padding:12px;background:#f0f9ff;border-radius:6px;margin-bottom:16px;font-size:13px;color:#4A90D9">
+          加载中...
+        </div>
+        <div id="repair-form-container" style="display:none">
+          <div class="form-group">
+            <label>故障情况描述</label>
+            <textarea id="repair-description" placeholder="请详细描述故障情况..." style="width:100%;min-height:100px;padding:10px 14px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;resize:vertical;outline:none;font-family:inherit"></textarea>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn btn-primary" onclick="submitRepair()">提交报修</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">我的报修记录</div>
+        <table>
+          <thead><tr><th>机器号</th><th>故障描述</th><th>状态</th><th>提交时间</th><th>处理时间</th></tr></thead>
+          <tbody id="repair-my-records"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Repair Admin Panel -->
+    <div class="panel" id="panel-repair-admin">
+      <div class="panel-header">
+        <h2>报修管理</h2>
+        <div style="display:flex;gap:8px">
+          <select id="repair-status-filter" onchange="loadRepairAdmin(1)" style="padding:8px 14px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;outline:none">
+            <option value="">全部状态</option>
+            <option value="0">待处理</option>
+            <option value="1">已处理</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">待处理报修 (<span id="repair-pending-count">0</span>)</div>
+        <table>
+          <thead><tr><th>ID</th><th>提交者</th><th>机器号</th><th>故障情况</th><th>提交时间</th><th>操作</th></tr></thead>
+          <tbody id="repair-pending-table"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">全部报修记录</div>
+        <table>
+          <thead><tr><th>ID</th><th>提交者</th><th>机器号</th><th>故障情况</th><th>状态</th><th>提交时间</th><th>处理时间</th></tr></thead>
+          <tbody id="repair-all-table"></tbody>
+        </table>
+        <div class="pagination" id="repair-pagination"></div>
+      </div>
+    </div>
+
+<!-- Snack Admin Panel -->
+    <div class="panel" id="panel-snack-admin">
+      <div class="panel-header"><h2>超市管理</h2><button class="btn btn-primary" onclick="openSnackProductModal()">+ 添加商品</button></div>
+      <div class="card">
+        <div class="card-title">商品列表</div>
+        <table>
+          <thead><tr><th>ID</th><th>商品名</th><th>单价</th><th>库存</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody id="snack-products-table"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">待确认订单</div>
+        <table>
+          <thead><tr><th>ID</th><th>用户</th><th>商品</th><th>数量</th><th>单价</th><th>总价</th><th>下单时间</th><th>操作</th></tr></thead>
+          <tbody id="snack-pending-orders"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">全部订单</div>
+        <table>
+          <thead><tr><th>ID</th><th>用户</th><th>商品</th><th>数量</th><th>总价</th><th>状态</th><th>时间</th></tr></thead>
+          <tbody id="snack-all-orders"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Snack Shop Panel -->
+    <div class="panel" id="panel-snack-shop">
+      <div class="panel-header"><h2>零食超市</h2></div>
+      <div class="card">
+        <div class="card-title">商品列表</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px" id="snack-shop-grid"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">我的订单</div>
+        <table>
+          <thead><tr><th>商品</th><th>数量</th><th>总价</th><th>状态</th><th>时间</th></tr></thead>
+          <tbody id="snack-my-orders"></tbody>
+        </table>
       </div>
     </div>
 
@@ -1139,6 +1307,21 @@ table tbody tr:hover {
   </div>
 </div>
 
+<!-- Snack Product Modal -->
+<div class="modal-overlay" id="snack-product-modal">
+  <div class="modal">
+    <h3 id="snack-modal-title">添加商品</h3>
+    <div class="form-group"><label>商品名称</label><input type="text" id="snm-name" placeholder="商品名称"></div>
+    <div class="form-group"><label>单价（元）</label><input type="number" id="snm-price" min="0" step="0.01" placeholder="单价"></div>
+    <div class="form-group"><label>库存</label><input type="number" id="snm-stock" min="0" step="1" value="100"></div>
+    <div class="form-group"><label>状态</label><select id="snm-status"><option value="1">上架</option><option value="0">下架</option></select></div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="saveSnackProduct()">保存</button>
+      <button class="btn btn-default" onclick="closeSnackProductModal()">取消</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container"></div>
 
@@ -1192,15 +1375,25 @@ async function apiFetch(url, options) {
         showToast('登录已过期，请重新登录', 'error');
         doLogout();
       }
-      throw new Error('Unauthorized');
+      throw new Error('密码错误');
     }
-    var data = await resp.json();
+var contentType = resp.headers.get('content-type') || '';
+    var data;
+    if (contentType.indexOf('application/json') !== -1) {
+      data = await resp.json();
+    } else {
+      var text = await resp.text();
+      if (!resp.ok) {
+        throw new Error(text || '请求失败（' + resp.status + '）');
+      }
+      return text;
+    }
     if (!resp.ok) {
       throw new Error(data.message || data.error || '请求失败');
     }
     return data;
   } catch (e) {
-    if (e.message !== 'Unauthorized') {
+    if (e.message !== '密码错误') {
       throw e;
     }
     throw e;
@@ -1321,9 +1514,14 @@ function switchPanel(panelName, el) {
   else if (panelName === 'online') loadOnline();
   else if (panelName === 'recharge') loadRechargePanel();
   else if (panelName === 'vip') loadVipPanel();
+  else if (panelName === 'settings') loadSettings();
   else if (panelName === 'reports') loadReports();
   else if (panelName === 'logs') loadLogs(1);
+  else if (panelName === 'snack-admin') loadSnackAdmin();
+  else if (panelName === 'snack-shop') loadSnackShop();
   else if (panelName === 'user-center') loadUserCenter();
+  else if (panelName === 'repair') loadRepairUser();
+  else if (panelName === 'repair-admin') loadRepairAdmin(1);
 }
 
 // Dashboard
@@ -1515,14 +1713,19 @@ async function deleteUser(userId) {
 }
 
 // Online
+var serverTimeOffset = 0;
 async function loadOnline() {
   showLoading();
   try {
     var activeData = await apiFetch('/api/charge/active');
     var historyData = await apiFetch('/api/charge/history?page=1&pageSize=10');
 
+    if (activeData.serverTime) {
+      serverTimeOffset = Date.now() - new Date(activeData.serverTime).getTime();
+    }
+
     var activeList = activeData.data || activeData || [];
-    if (!Array.isArray(activeList)) activeList = activeList.records || activeList.list || [];
+    if (!Array.isArray(activeList)) activeList = activeData.records || activeData.list || [];
 
     var activeTbody = document.getElementById('active-sessions-table');
     var activeEmpty = document.getElementById('active-sessions-empty');
@@ -1574,21 +1777,27 @@ async function loadOnline() {
   startTimers();
 }
 
+var timerInterval = null;
 function startTimers() {
-  setInterval(function() {
+  if (timerInterval) clearInterval(timerInterval);
+  if (currentPanel !== 'online') return;
+  function updateTimers() {
     if (currentPanel !== 'online') return;
+    var serverNow = Date.now() - serverTimeOffset;
     document.querySelectorAll('.timer[data-start]').forEach(function(el) {
       var startTime = el.getAttribute('data-start');
       if (!startTime) return;
       var start = new Date(startTime).getTime();
-      var now = Date.now();
-      var diff = Math.floor((now - start) / 1000);
+      var diff = Math.floor((serverNow - start) / 1000);
+      if (diff < 0) diff = 0;
       var hours = Math.floor(diff / 3600);
       var mins = Math.floor((diff % 3600) / 60);
       var secs = diff % 60;
       el.textContent = hours + '时' + String(mins).padStart(2, '0') + '分' + String(secs).padStart(2, '0') + '秒';
     });
-  }, 1000);
+  }
+  updateTimers();
+  timerInterval = setInterval(updateTimers, 1000);
 }
 
 async function startOnline() {
@@ -1816,6 +2025,82 @@ async function doVipUpgrade() {
     loadVipPanel();
   } catch (e) {
     showToast('升级失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// Settings
+async function loadSettings() {
+  showLoading();
+  try {
+    var configData = await apiFetch('/api/config');
+    var config = configData.data || configData || {};
+    document.getElementById('settings-base-price').value = config.basePrice || '';
+    document.getElementById('settings-peak-price').value = config.peakPrice || '';
+    document.getElementById('settings-night-price').value = config.nightPrice || '';
+    document.getElementById('settings-peak-start').value = config.peakStartHour !== undefined ? config.peakStartHour : '';
+    document.getElementById('settings-peak-end').value = config.peakEndHour !== undefined ? config.peakEndHour : '';
+    document.getElementById('settings-night-start').value = config.nightStartHour !== undefined ? config.nightStartHour : '';
+    document.getElementById('settings-night-end').value = config.nightEndHour !== undefined ? config.nightEndHour : '';
+
+    var vipData = await apiFetch('/api/vip/levels');
+    var levels = vipData.data || vipData || [];
+    if (!Array.isArray(levels)) levels = levels.records || levels.list || [];
+
+    var baseP = parseFloat(config.basePrice) || 0;
+    var peakP = parseFloat(config.peakPrice) || 0;
+    var nightP = parseFloat(config.nightPrice) || 0;
+
+    var previewHtml = '';
+    levels.forEach(function(l) {
+      var discount = l.discountRate || 0;
+      previewHtml += '<tr>';
+      previewHtml += '<td>' + (l.levelName || '') + '</td>';
+      previewHtml += '<td>' + (discount * 100).toFixed(0) + '%</td>';
+      previewHtml += '<td>¥' + (baseP * discount).toFixed(2) + '</td>';
+      previewHtml += '<td>¥' + (peakP * discount).toFixed(2) + '</td>';
+      previewHtml += '<td>¥' + (nightP * discount).toFixed(2) + '</td>';
+      previewHtml += '</tr>';
+    });
+    if (!previewHtml) previewHtml = '<tr><td colspan="5" class="empty-state">暂无VIP等级数据</td></tr>';
+    document.getElementById('settings-vip-preview').innerHTML = previewHtml;
+  } catch (e) {
+    showToast('加载设置失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function saveSettings() {
+  var basePrice = parseFloat(document.getElementById('settings-base-price').value);
+  var peakPrice = parseFloat(document.getElementById('settings-peak-price').value);
+  var nightPrice = parseFloat(document.getElementById('settings-night-price').value);
+  var peakStart = document.getElementById('settings-peak-start').value;
+  var peakEnd = document.getElementById('settings-peak-end').value;
+  var nightStart = document.getElementById('settings-night-start').value;
+  var nightEnd = document.getElementById('settings-night-end').value;
+
+  if (isNaN(basePrice) && isNaN(peakPrice) && isNaN(nightPrice) && !peakStart && !peakEnd && !nightStart && !nightEnd) {
+    showToast('请至少填写一项设置', 'error');
+    return;
+  }
+
+  showLoading();
+  try {
+    var body = {};
+    if (!isNaN(basePrice)) body.basePrice = basePrice;
+    if (!isNaN(peakPrice)) body.peakPrice = peakPrice;
+    if (!isNaN(nightPrice)) body.nightPrice = nightPrice;
+    if (peakStart) body.peakStartHour = parseInt(peakStart);
+    if (peakEnd) body.peakEndHour = parseInt(peakEnd);
+    if (nightStart) body.nightStartHour = parseInt(nightStart);
+    if (nightEnd) body.nightEndHour = parseInt(nightEnd);
+    await apiFetch('/api/config', { method: 'PUT', body: JSON.stringify(body) });
+    showToast('设置保存成功', 'success');
+    loadSettings();
+  } catch (e) {
+    showToast('保存设置失败: ' + e.message, 'error');
   } finally {
     hideLoading();
   }
@@ -2058,7 +2343,7 @@ async function loadUserCenter() {
       document.getElementById('up-username').textContent = profile.username || '-';
       document.getElementById('up-realname').textContent = profile.realName || '-';
       document.getElementById('up-balance').textContent = '¥' + (profile.balance || 0).toFixed(2);
-      document.getElementById('up-vip').textContent = profile.vipLevelName || ('Lv.' + (profile.vipLevel || 1));
+document.getElementById('up-vip').textContent = profile.vipLevelName || '普通会员';
       document.getElementById('up-points').textContent = profile.points || 0;
       document.getElementById('up-phone').textContent = profile.phone || '-';
     }
@@ -2143,6 +2428,372 @@ async function changeUserPassword() {
   }
 }
 
+// Snack Shop
+var snackEditingId = null;
+
+async function loadSnackAdmin() {
+  showLoading();
+  try {
+    var productsData = await apiFetch('/api/snacks/products/admin');
+    var products = productsData.data || productsData || [];
+    if (!Array.isArray(products)) products = products.records || products.list || [];
+    var productsHtml = '';
+    products.forEach(function(p) {
+      productsHtml += '<tr>';
+      productsHtml += '<td>' + (p.id || '') + '</td>';
+      productsHtml += '<td>' + (p.name || '') + '</td>';
+      productsHtml += '<td>¥' + (p.price || 0).toFixed(2) + '</td>';
+      productsHtml += '<td>' + (p.stock || 0) + '</td>';
+      productsHtml += '<td>' + (p.status === 1 ? '上架' : '下架') + '</td>';
+      productsHtml += '<td><button class="btn btn-primary btn-sm" onclick="openSnackProductModal(' + (p.id || 0) + ')">编辑</button> <button class="btn btn-danger btn-sm" onclick="deleteSnackProduct(' + (p.id || 0) + ')">删除</button></td>';
+      productsHtml += '</tr>';
+    });
+    if (!productsHtml) productsHtml = '<tr><td colspan="6" class="empty-state">暂无商品</td></tr>';
+    document.getElementById('snack-products-table').innerHTML = productsHtml;
+
+    var pendingData = await apiFetch('/api/snacks/orders/pending');
+    var pending = pendingData.data || pendingData || [];
+    if (!Array.isArray(pending)) pending = pending.records || pending.list || [];
+    var pendingHtml = '';
+    pending.forEach(function(o) {
+      pendingHtml += '<tr>';
+      pendingHtml += '<td>' + (o.id || '') + '</td>';
+      pendingHtml += '<td>' + (o.username || '') + '</td>';
+      pendingHtml += '<td>' + (o.productName || '') + '</td>';
+      pendingHtml += '<td>' + (o.quantity || 0) + '</td>';
+      pendingHtml += '<td>¥' + (o.unitPrice || 0).toFixed(2) + '</td>';
+      pendingHtml += '<td>¥' + (o.totalPrice || 0).toFixed(2) + '</td>';
+      pendingHtml += '<td>' + (o.orderTime || '') + '</td>';
+      pendingHtml += '<td><button class="btn btn-success btn-sm" onclick="confirmSnackOrder(' + (o.id || 0) + ')">确认</button> <button class="btn btn-danger btn-sm" onclick="cancelSnackOrder(' + (o.id || 0) + ')">取消</button></td>';
+      pendingHtml += '</tr>';
+    });
+    if (!pendingHtml) pendingHtml = '<tr><td colspan="8" class="empty-state">暂无待确认订单</td></tr>';
+    document.getElementById('snack-pending-orders').innerHTML = pendingHtml;
+
+    var allData = await apiFetch('/api/snacks/orders');
+    var allOrders = allData.data || allData || [];
+    if (!Array.isArray(allOrders)) allOrders = allOrders.records || allOrders.list || [];
+    var allHtml = '';
+    allOrders.forEach(function(o) {
+      allHtml += '<tr>';
+      allHtml += '<td>' + (o.id || '') + '</td>';
+      allHtml += '<td>' + (o.username || '') + '</td>';
+      allHtml += '<td>' + (o.productName || '') + '</td>';
+      allHtml += '<td>' + (o.quantity || 0) + '</td>';
+      var statusMap = {0:'待确认', 1:'已完成', 2:'已取消'};
+      allHtml += '<td>¥' + (o.totalPrice || 0).toFixed(2) + '</td>';
+      allHtml += '<td>' + (statusMap[o.status] || '未知') + '</td>';
+      allHtml += '<td>' + (o.orderTime || '') + '</td>';
+      allHtml += '</tr>';
+    });
+    if (!allHtml) allHtml = '<tr><td colspan="7" class="empty-state">暂无订单</td></tr>';
+    document.getElementById('snack-all-orders').innerHTML = allHtml;
+  } catch (e) {
+    showToast('加载超市管理失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function loadSnackShop() {
+  showLoading();
+  try {
+    var productsData = await apiFetch('/api/snacks/products');
+    var products = productsData.data || productsData || [];
+    if (!Array.isArray(products)) products = products.records || products.list || [];
+    renderSnackShopGrid(products);
+
+    var ordersData = await apiFetch('/api/snacks/orders');
+    var orders = ordersData.data || ordersData || [];
+    if (!Array.isArray(orders)) orders = orders.records || orders.list || [];
+    var ordersHtml = '';
+    orders.forEach(function(o) {
+      ordersHtml += '<tr>';
+      ordersHtml += '<td>' + (o.productName || '') + '</td>';
+      ordersHtml += '<td>' + (o.quantity || 0) + '</td>';
+      var myStatusMap = {0:'待确认', 1:'已完成', 2:'已取消'};
+      ordersHtml += '<td>¥' + (o.totalPrice || 0).toFixed(2) + '</td>';
+      ordersHtml += '<td>' + (myStatusMap[o.status] || '未知') + '</td>';
+      ordersHtml += '<td>' + (o.orderTime || '') + '</td>';
+      ordersHtml += '</tr>';
+    });
+    if (!ordersHtml) ordersHtml = '<tr><td colspan="5" class="empty-state">暂无订单</td></tr>';
+    document.getElementById('snack-my-orders').innerHTML = ordersHtml;
+  } catch (e) {
+    showToast('加载零食超市失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+function renderSnackShopGrid(products) {
+  var grid = document.getElementById('snack-shop-grid');
+  if (!products || products.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">暂无商品</div>';
+    return;
+  }
+  var html = '';
+  products.forEach(function(p) {
+    html += '<div style="border:1px solid #f0f0f0;border-radius:8px;padding:12px;text-align:center;background:#fff">';
+    html += '<div style="font-weight:600;font-size:15px;margin-bottom:4px">' + (p.name || '') + '</div>';
+    html += '<div style="color:#E74C3C;font-weight:700;font-size:18px;margin-bottom:8px">¥' + (p.price || 0).toFixed(2) + '</div>';
+    html += '<div style="font-size:12px;color:#999;margin-bottom:8px">库存: ' + (p.stock || 0) + '</div>';
+    html += '<button class="btn btn-primary btn-sm" onclick="placeSnackOrder(' + (p.id || 0) + ')" ' + ((p.stock || 0) <= 0 ? 'disabled' : '') + '>购买</button>';
+    html += '</div>';
+  });
+  grid.innerHTML = html;
+}
+
+function openSnackProductModal(id) {
+  snackEditingId = id || null;
+  document.getElementById('snack-modal-title').textContent = id ? '编辑商品' : '添加商品';
+  document.getElementById('snm-name').value = '';
+  document.getElementById('snm-price').value = '';
+  document.getElementById('snm-stock').value = '100';
+  document.getElementById('snm-status').value = '1';
+
+  if (id) {
+    showLoading();
+    apiFetch('/api/snacks/products/' + id).then(function(data) {
+      var p = data.data || data;
+      if (p) {
+        document.getElementById('snm-name').value = p.name || '';
+        document.getElementById('snm-price').value = p.price || '';
+        document.getElementById('snm-stock').value = p.stock || 100;
+        document.getElementById('snm-status').value = p.status !== undefined ? p.status : 1;
+      }
+      hideLoading();
+    }).catch(function(e) {
+      hideLoading();
+      showToast('加载商品信息失败', 'error');
+    });
+  }
+
+  document.getElementById('snack-product-modal').classList.add('show');
+}
+
+function closeSnackProductModal() {
+  document.getElementById('snack-product-modal').classList.remove('show');
+  snackEditingId = null;
+}
+
+async function saveSnackProduct() {
+  var name = document.getElementById('snm-name').value.trim();
+  var price = parseFloat(document.getElementById('snm-price').value);
+  var stock = parseInt(document.getElementById('snm-stock').value) || 0;
+  var status = parseInt(document.getElementById('snm-status').value);
+
+  if (!name) { showToast('请输入商品名称', 'error'); return; }
+  if (isNaN(price) || price <= 0) { showToast('请输入有效单价', 'error'); return; }
+
+  showLoading();
+  try {
+    var body = { name: name, price: price, stock: stock, status: status };
+    if (snackEditingId) {
+      await apiFetch('/api/snacks/products/' + snackEditingId, { method: 'PUT', body: JSON.stringify(body) });
+      showToast('商品更新成功', 'success');
+    } else {
+      await apiFetch('/api/snacks/products', { method: 'POST', body: JSON.stringify(body) });
+      showToast('商品添加成功', 'success');
+    }
+    closeSnackProductModal();
+    loadSnackAdmin();
+  } catch (e) {
+    showToast('保存失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function deleteSnackProduct(id) {
+  if (!confirm('确定要删除该商品吗？')) return;
+  showLoading();
+  try {
+    await apiFetch('/api/snacks/products/' + id, { method: 'DELETE' });
+    showToast('商品已删除', 'success');
+    loadSnackAdmin();
+  } catch (e) {
+    showToast('删除失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function placeSnackOrder(productId) {
+  var quantity = prompt('请输入购买数量：', '1');
+  if (quantity === null) return;
+  var qty = parseInt(quantity);
+  if (!qty || qty <= 0) { showToast('请输入有效数量', 'error'); return; }
+
+  showLoading();
+  try {
+    await apiFetch('/api/snacks/orders', {
+      method: 'POST',
+      body: JSON.stringify({ productId: productId, quantity: qty })
+    });
+    showToast('下单成功，等待管理员确认', 'success');
+    loadSnackShop();
+  } catch (e) {
+    showToast('下单失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function confirmSnackOrder(orderId) {
+  showLoading();
+  try {
+    await apiFetch('/api/snacks/orders/' + orderId + '/confirm', { method: 'PUT' });
+    showToast('订单已确认', 'success');
+    loadSnackAdmin();
+  } catch (e) {
+    showToast('确认失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function cancelSnackOrder(orderId) {
+  showLoading();
+  try {
+    await apiFetch('/api/snacks/orders/' + orderId + '/cancel', { method: 'PUT' });
+    showToast('订单已取消', 'success');
+    loadSnackAdmin();
+  } catch (e) {
+    showToast('取消失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+// Repair
+async function loadRepairUser() {
+  showLoading();
+  try {
+    var statusEl = document.getElementById('repair-status-info');
+    var formContainer = document.getElementById('repair-form-container');
+    var statusData = await apiFetch('/api/user/online-status');
+    if (statusData && statusData.online) {
+      statusEl.innerHTML = '<span style="font-weight:600;color:#27ae60">当前正在上机</span>，机器号：<b>' + (statusData.machineNo || '-') + '</b>';
+      formContainer.style.display = 'block';
+    } else {
+      statusEl.innerHTML = '<span style="color:#999">您当前未上机，无法提交报修</span>';
+      formContainer.style.display = 'none';
+    }
+    document.getElementById('repair-description').value = '';
+    var records = await apiFetch('/api/repair');
+    var list = records.data || records || [];
+    if (!Array.isArray(list)) list = list.records || list.list || [];
+    var html = '';
+    if (list.length === 0) {
+      html = '<tr><td colspan="5" class="empty-state">暂无报修记录</td></tr>';
+    } else {
+      list.forEach(function(r) {
+        html += '<tr>';
+        html += '<td>' + (r.machineNo || '') + '</td>';
+        html += '<td>' + (r.description || '') + '</td>';
+        html += '<td>' + (r.status === 0 ? '<span style="color:#E74C3C">待处理</span>' : '<span style="color:#27AE60">已处理</span>') + '</td>';
+        html += '<td>' + (r.createTime || '') + '</td>';
+        html += '<td>' + (r.handleTime || '-') + '</td>';
+        html += '</tr>';
+      });
+    }
+    document.getElementById('repair-my-records').innerHTML = html;
+  } catch (e) {
+    showToast('加载报修数据失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function submitRepair() {
+  var desc = document.getElementById('repair-description').value.trim();
+  if (!desc) { showToast('请填写故障情况描述', 'error'); return; }
+  showLoading();
+  try {
+    await apiFetch('/api/repair', {
+      method: 'POST',
+      body: JSON.stringify({ description: desc })
+    });
+    showToast('报修提交成功', 'success');
+    loadRepairUser();
+  } catch (e) {
+    showToast('提交失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+var repairAdminPage = 1;
+var repairAdminPageSize = 15;
+
+async function loadRepairAdmin(page) {
+  repairAdminPage = page || repairAdminPage;
+  showLoading();
+  try {
+    var pendingCountData = await apiFetch('/api/repair/pending-count');
+    document.getElementById('repair-pending-count').textContent = pendingCountData.count || 0;
+    var statusFilter = document.getElementById('repair-status-filter').value;
+    var allResp = await apiFetch('/api/repair');
+    var allList = allResp.data || allResp || [];
+    if (!Array.isArray(allList)) allList = allList.records || allList.list || [];
+    if (statusFilter) {
+      allList = allList.filter(function(r) { return r.status == statusFilter; });
+    }
+    var pendingHtml = '';
+    var pendingList = allList.filter(function(r) { return r.status === 0; });
+    if (pendingList.length === 0) {
+      pendingHtml = '<tr><td colspan="6" class="empty-state">暂无待处理报修</td></tr>';
+    } else {
+      pendingList.forEach(function(r) {
+        pendingHtml += '<tr>';
+        pendingHtml += '<td>' + (r.id || '') + '</td>';
+        pendingHtml += '<td>' + (r.username || '') + '</td>';
+        pendingHtml += '<td>' + (r.machineNo || '') + '</td>';
+        pendingHtml += '<td>' + (r.description || '') + '</td>';
+        pendingHtml += '<td>' + (r.createTime || '') + '</td>';
+        pendingHtml += '<td><button class="btn btn-success btn-sm" onclick="markRepairDone(' + (r.id || 0) + ')">标记已处理</button></td>';
+        pendingHtml += '</tr>';
+      });
+    }
+    document.getElementById('repair-pending-table').innerHTML = pendingHtml;
+    var allHtml = '';
+    if (allList.length === 0) {
+      allHtml = '<tr><td colspan="7" class="empty-state">暂无报修记录</td></tr>';
+    } else {
+      allList.forEach(function(r) {
+        allHtml += '<tr>';
+        allHtml += '<td>' + (r.id || '') + '</td>';
+        allHtml += '<td>' + (r.username || '') + '</td>';
+        allHtml += '<td>' + (r.machineNo || '') + '</td>';
+        allHtml += '<td>' + (r.description || '') + '</td>';
+        allHtml += '<td>' + (r.status === 0 ? '<span style="color:#E74C3C">待处理</span>' : '<span style="color:#27AE60">已处理</span>') + '</td>';
+        allHtml += '<td>' + (r.createTime || '') + '</td>';
+        allHtml += '<td>' + (r.handleTime || '-') + '</td>';
+        allHtml += '</tr>';
+      });
+    }
+    document.getElementById('repair-all-table').innerHTML = allHtml;
+  } catch (e) {
+    showToast('加载报修管理失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+async function markRepairDone(id) {
+  showLoading();
+  try {
+    await apiFetch('/api/repair/' + id + '/done', { method: 'PUT' });
+    showToast('已标记为已处理', 'success');
+    loadRepairAdmin(1);
+  } catch (e) {
+    showToast('操作失败: ' + e.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
 // Keyboard support
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
@@ -2159,6 +2810,9 @@ document.getElementById('user-modal').addEventListener('click', function(e) {
 });
 document.getElementById('vip-level-modal').addEventListener('click', function(e) {
   if (e.target === this) closeVipLevelModal();
+});
+document.getElementById('snack-product-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeSnackProductModal();
 });
 
 // Check session on load

@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" font-family="SimHei, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
+    </marker>
+  </defs>
+  
+  <rect width="900" height="650" fill="#fff"/>
+  
+  <text x="450" y="28" text-anchor="middle" font-size="20" font-weight="bold" fill="#000">网吧计费管理系统 - 数据流图</text>
+  
+  <rect x="30" y="60" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="70" y="83" text-anchor="middle" font-size="13" fill="#000">管理员</text>
+  
+  <rect x="30" y="320" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="70" y="343" text-anchor="middle" font-size="13" fill="#000">普通用户</text>
+  
+  <ellipse cx="220" cy="70" rx="60" ry="25" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="220" y="75" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">P1 登录</text>
+  
+  <ellipse cx="220" cy="160" rx="60" ry="25" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="220" y="165" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">P2 用户</text>
+  
+  <ellipse cx="220" cy="250" rx="60" ry="25" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="220" y="255" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">P3 上机</text>
+  
+  <ellipse cx="220" cy="340" rx="60" ry="25" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="220" y="345" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">P4 充值</text>
+  
+  <ellipse cx="220" cy="430" rx="60" ry="25" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="220" y="435" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">P5 会员</text>
+  
+  <ellipse cx="460" cy="115" rx="60" ry="25" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="460" y="120" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">P6 零食</text>
+  
+  <ellipse cx="460" cy="205" rx="60" ry="25" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="460" y="210" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">P7 报修</text>
+  
+  <ellipse cx="460" cy="295" rx="60" ry="25" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="460" y="300" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">P8 配置</text>
+  
+  <ellipse cx="460" cy="385" rx="60" ry="25" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="460" y="390" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">P9 报表</text>
+  
+  <g transform="translate(680, 50)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D1</text>
+  </g>
+  <text x="745" y="63" text-anchor="start" font-size="10" fill="#000">管理员</text>
+  
+  <g transform="translate(680, 85)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D2</text>
+  </g>
+  <text x="745" y="98" text-anchor="start" font-size="10" fill="#000">用户</text>
+  
+  <g transform="translate(680, 120)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D3</text>
+  </g>
+  <text x="745" y="133" text-anchor="start" font-size="10" fill="#000">会员等级</text>
+  
+  <g transform="translate(680, 155)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D4</text>
+  </g>
+  <text x="745" y="168" text-anchor="start" font-size="10" fill="#000">上机记录</text>
+  
+  <g transform="translate(680, 190)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D5</text>
+  </g>
+  <text x="745" y="203" text-anchor="start" font-size="10" fill="#000">充值记录</text>
+  
+  <g transform="translate(680, 225)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D6</text>
+  </g>
+  <text x="745" y="238" text-anchor="start" font-size="10" fill="#000">消费记录</text>
+  
+  <g transform="translate(680, 260)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D7</text>
+  </g>
+  <text x="745" y="273" text-anchor="start" font-size="10" fill="#000">系统日志</text>
+  
+  <g transform="translate(680, 295)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D8</text>
+  </g>
+  <text x="745" y="308" text-anchor="start" font-size="10" fill="#000">报修</text>
+  
+  <g transform="translate(680, 330)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D9</text>
+  </g>
+  <text x="745" y="343" text-anchor="start" font-size="10" fill="#000">零食商品</text>
+  
+  <g transform="translate(680, 365)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D10</text>
+  </g>
+  <text x="745" y="378" text-anchor="start" font-size="10" fill="#000">零食订单</text>
+  
+  <g transform="translate(680, 400)">
+    <rect x="0" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="7" y="0" width="55" height="22" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="35" y="15" text-anchor="middle" font-size="11" font-weight="bold" fill="#000">D11</text>
+  </g>
+  <text x="745" y="413" text-anchor="start" font-size="10" fill="#000">系统配置</text>
+  
+  <path d="M 110 78 L 155 78 L 155 70 L 160 70" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 78 L 150 78 L 150 160 L 160 160" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 78 L 145 78 L 145 250 L 160 250" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 78 L 140 78 L 140 340 L 160 340" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 78 L 135 78 L 135 430 L 160 430" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 78 L 380 78 L 380 115 L 400 115" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 78 L 375 78 L 375 205 L 400 205" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 78 L 370 78 L 370 295 L 400 295" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 78 L 365 78 L 365 385 L 400 385" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  
+  <path d="M 110 338 L 155 338 L 155 70 L 160 70" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 338 L 150 338 L 150 250 L 160 250" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 338 L 145 338 L 145 430 L 160 430" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 338 L 385 338 L 385 115 L 400 115" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 110 338 L 380 338 L 380 205 L 400 205" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  
+  <path d="M 280 70 L 580 70 L 580 61 L 680 61" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 280 160 L 570 160 L 570 96 L 680 96" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 280 250 L 560 250 L 560 166 L 680 166" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 280 340 L 550 340 L 550 201 L 680 201" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 280 430 L 540 430 L 540 131 L 680 131" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  
+  <path d="M 520 115 L 530 115 L 530 236 L 680 236" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 520 205 L 525 205 L 525 306 L 680 306" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 520 295 L 545 295 L 545 411 L 680 411" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 520 385 L 535 385 L 535 341 L 680 341" stroke="#000" stroke-width="1.2" fill="none" marker-end="url(#arrow)"/>
+  
+  <g transform="translate(40, 500)">
+    <rect x="0" y="0" width="130" height="110" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="65" y="18" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">图例</text>
+    <rect x="10" y="30" width="35" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    <text x="55" y="42" text-anchor="start" font-size="11" fill="#000">外部实体</text>
+    <ellipse cx="27" cy="68" rx="18" ry="10" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    <text x="55" y="72" text-anchor="start" font-size="11" fill="#000">处理过程</text>
+    <g transform="translate(10, 80)">
+      <rect x="0" y="0" width="35" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+      <rect x="4" y="0" width="35" height="18" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    </g>
+    <text x="55" y="93" text-anchor="start" font-size="11" fill="#000">数据存储</text>
+  </g>
+</svg>

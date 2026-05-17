@@ -41,13 +41,21 @@ public class LogService {
      * @param operationContent 操作详细内容，描述具体执行了什么操作
      */
     public void addLog(String operatorName, String operationType, String operationContent) {
-        SystemLog log = new SystemLog();
-        log.setOperatorName(operatorName);
-        log.setOperationType(operationType);
-        log.setOperationContent(operationContent);
-        log.setCreateTime(DateUtil.getCurrentDateTime());
+        try {
+            SystemLog log = new SystemLog();
+            log.setOperatorName(operatorName);
+            log.setOperationType(operationType);
+            log.setOperationContent(operationContent);
+            log.setCreateTime(DateUtil.getCurrentDateTime());
 
-        systemLogDao.insert(log);
+            systemLogDao.insert(log);
+        } catch (Exception e) {
+            System.err.println("记录日志失败: " + e.getMessage());
+        }
+    }
+
+    public void addOperationLog(String operator, String type, String content) {
+        addLog(operator, type, content);
     }
 
     /**

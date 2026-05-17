@@ -1,9 +1,13 @@
 package com.internetcafe;
 
 import com.internetcafe.controller.ChargeController;
+import com.internetcafe.controller.ConfigController;
+import com.internetcafe.controller.FileUploadController;
 import com.internetcafe.controller.LogController;
 import com.internetcafe.controller.LoginController;
+import com.internetcafe.controller.RepairController;
 import com.internetcafe.controller.ReportController;
+import com.internetcafe.controller.SnackController;
 import com.internetcafe.controller.UserController;
 import com.internetcafe.controller.VipController;
 import com.internetcafe.service.ChargeService;
@@ -145,6 +149,18 @@ public class WebServer {
 
             /* 注册日志管理路由 */
             server.createContext("/api/logs", new LogController());
+
+            /* 注册系统配置路由 */
+            server.createContext("/api/config", new ConfigController());
+
+            /* 注册零食超市路由 */
+            server.createContext("/api/snacks", new SnackController());
+
+            /* 注册文件上传路由 */
+            server.createContext("/api/upload", new FileUploadController());
+
+            /* 注册报修路由 */
+            server.createContext("/api/repair", new RepairController());
 
             /* 注册静态文件服务 —— 处理所有非API路径的请求，提供前端页面 */
             server.createContext("/", new StaticFileHandler());

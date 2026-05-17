@@ -30,6 +30,8 @@ public class UserService {
     /** 充值记录数据访问对象，用于在充值时创建充值记录 */
     private RechargeRecordDao rechargeRecordDao;
 
+    private LogService logService;
+
     /**
      * 构造方法
      * 初始化用户DAO和充值记录DAO对象
@@ -37,6 +39,7 @@ public class UserService {
     public UserService() {
         this.userDao = new UserDao();
         this.rechargeRecordDao = new RechargeRecordDao();
+        this.logService = new LogService();
     }
 
     /**
@@ -333,10 +336,13 @@ public class UserService {
             DBUtil.commitTransaction(conn);
             System.out.println("充值成功：用户 [" + user.getUsername() + "] 充值 " + amount + " 元，"
                     + "操作员=" + operatorName + "，充值后余额=" + newBalance);
+            logService.addOperationLog(operatorName, "充值",
+                    "用户 [" + user.getUsername() + "] 充值 " + amount + " 元，充值后余额=" + newBalance);
             return true;
         } catch (Exception e) {
             DBUtil.rollbackTransaction(conn);
             System.err.println("充值异常：" + e.getMessage());
+            logService.addErrorLog(operatorName, "充值异常: userId=" + userId + ", " + e.getMessage());
             return false;
         } finally {
             DBUtil.closeAll(conn, null);

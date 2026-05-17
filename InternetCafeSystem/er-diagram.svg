@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="900" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Microsoft YaHei', sans-serif; font-size: 14px;">
+
+<!-- 白色背景 -->
+<rect width="1200" height="900" fill="white"/>
+
+<!-- 标题 -->
+<text x="600" y="30" text-anchor="middle" font-size="20" font-weight="bold">数据库E-R图</text>
+
+<!-- ===== 实体定义：矩形框 ===== -->
+
+<!-- 用户表 (中间偏左) -->
+<rect x="60" y="350" width="130" height="50" fill="#e3f2fd" stroke="#1565c0" stroke-width="2" rx="5"/>
+<text x="125" y="380" text-anchor="middle" font-size="14" font-weight="bold">用户表 (user)</text>
+
+<!-- 管理员表 (左上) -->
+<rect x="60" y="70" width="130" height="50" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="5"/>
+<text x="125" y="100" text-anchor="middle" font-size="14" font-weight="bold">管理员表 (admin)</text>
+
+<!-- 会员等级表 (左下) -->
+<rect x="60" y="630" width="130" height="50" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2" rx="5"/>
+<text x="125" y="660" text-anchor="middle" font-size="14" font-weight="bold">会员等级表</text>
+<text x="125" y="675" text-anchor="middle" font-size="12">(vip_level)</text>
+
+<!-- 上机记录表 (右上) -->
+<rect x="380" y="70" width="130" height="50" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="5"/>
+<text x="445" y="100" text-anchor="middle" font-size="14" font-weight="bold">上机记录表</text>
+<text x="445" y="115" text-anchor="middle" font-size="12">(online_record)</text>
+
+<!-- 充值记录表 (右中上) -->
+<rect x="380" y="220" width="130" height="50" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="5"/>
+<text x="445" y="253" text-anchor="middle" font-size="14" font-weight="bold">充值记录表</text>
+<text x="445" y="268" text-anchor="middle" font-size="12">(recharge_record)</text>
+
+<!-- 消费记录表 (右中) -->
+<rect x="380" y="380" width="130" height="50" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="5"/>
+<text x="445" y="413" text-anchor="middle" font-size="14" font-weight="bold">消费记录表</text>
+<text x="445" y="428" text-anchor="middle" font-size="12">(consume_record)</text>
+
+<!-- 系统配置表 (右下) -->
+<rect x="380" y="630" width="130" height="50" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="5"/>
+<text x="445" y="660" text-anchor="middle" font-size="14" font-weight="bold">系统配置表</text>
+<text x="445" y="675" text-anchor="middle" font-size="12">(system_config)</text>
+
+<!-- 系统日志表 (右下) -->
+<rect x="380" y="530" width="130" height="50" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="5"/>
+<text x="445" y="563" text-anchor="middle" font-size="14" font-weight="bold">系统日志表</text>
+<text x="445" y="578" text-anchor="middle" font-size="12">(system_log)</text>
+
+<!-- 零食商品表 (右上远) -->
+<rect x="680" y="70" width="130" height="50" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="5"/>
+<text x="745" y="100" text-anchor="middle" font-size="14" font-weight="bold">零食商品表</text>
+<text x="745" y="115" text-anchor="middle" font-size="12">(snack_product)</text>
+
+<!-- 零食订单表 (右中) -->
+<rect x="680" y="220" width="130" height="50" fill="#e0f2f1" stroke="#00695c" stroke-width="2" rx="5"/>
+<text x="745" y="253" text-anchor="middle" font-size="14" font-weight="bold">零食订单表</text>
+<text x="745" y="268" text-anchor="middle" font-size="12">(snack_order)</text>
+
+<!-- 报修表 (右下) -->
+<rect x="680" y="380" width="130" height="50" fill="#fff8e1" stroke="#f57f17" stroke-width="2" rx="5"/>
+<text x="745" y="413" text-anchor="middle" font-size="14" font-weight="bold">报修表</text>
+<text x="745" y="428" text-anchor="middle" font-size="12">(repair_request)</text>
+
+<!-- ===== 连线 ===== -->
+
+<!-- 管理员表 → (独立，无连线) -->
+
+<!-- 用户表 → 上机记录表 -->
+<line x1="190" y1="375" x2="380" y2="95" stroke="#333" stroke-width="1.5"/>
+<text x="280" y="220" font-size="12" fill="#333">1:N</text>
+
+<!-- 用户表 → 充值记录表 -->
+<line x1="190" y1="375" x2="380" y2="245" stroke="#333" stroke-width="1.5"/>
+<text x="280" y="300" font-size="12" fill="#333">1:N</text>
+
+<!-- 用户表 → 消费记录表 -->
+<line x1="190" y1="375" x2="380" y2="405" stroke="#333" stroke-width="1.5"/>
+<text x="280" y="388" font-size="12" fill="#333">1:N</text>
+
+<!-- 用户表 → 零食订单表 -->
+<line x1="190" y1="375" x2="680" y2="245" stroke="#333" stroke-width="1.5"/>
+<text x="440" y="298" font-size="12" fill="#333">1:N</text>
+
+<!-- 用户表 → 报修表 -->
+<line x1="190" y1="375" x2="680" y2="405" stroke="#333" stroke-width="1.5"/>
+<text x="440" y="388" font-size="12" fill="#333">1:N</text>
+
+<!-- 会员等级表 → 用户表 -->
+<line x1="125" y1="630" x2="125" y2="400" stroke="#333" stroke-width="1.5"/>
+<text x="145" y="520" font-size="12" fill="#333">1:N</text>
+
+<!-- 零食商品表 → 零食订单表 -->
+<line x1="745" y1="120" x2="745" y2="220" stroke="#333" stroke-width="1.5"/>
+<text x="765" y="170" font-size="12" fill="#333">1:N</text>
+
+<!-- 图例 -->
+<rect x="60" y="780" width="180" height="100" fill="#f5f5f5" stroke="#999" stroke-width="1" rx="5"/>
+<text x="150" y="800" text-anchor="middle" font-size="13" font-weight="bold">图例</text>
+<rect x="80" y="815" width="15" height="15" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+<text x="100" y="827" font-size="12">核心实体表</text>
+<rect x="80" y="835" width="15" height="15" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+<text x="100" y="847" font-size="12">业务记录表</text>
+<rect x="80" y="855" width="15" height="15" fill="#fce4ec" stroke="#c62828" stroke-width="1.5"/>
+<text x="100" y="867" font-size="12">辅助配置表</text>
+
+</svg>

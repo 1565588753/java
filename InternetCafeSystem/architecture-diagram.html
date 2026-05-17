@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>系统总体架构图</title>
+<style>
+  body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f5f5f5; }
+  svg { background: white; }
+</style>
+</head>
+<body>
+<svg width="1200" height="850" xmlns="http://www.w3.org/2000/svg" style="font-family: 'Microsoft YaHei', sans-serif; font-size: 14px;">
+
+<!-- 标题 -->
+<text x="600" y="30" text-anchor="middle" font-size="20" font-weight="bold">系统总体架构图</text>
+
+<!-- ===== 前台（用户端）区域 ===== -->
+<g id="frontend">
+  <!-- 个人中心展开框 -->
+  <rect x="800" y="55" width="280" height="170" fill="#fff" stroke="#333" stroke-width="1.5" rx="5"/>
+  <text x="940" y="80" text-anchor="middle" font-size="13">个人中心</text>
+  <text x="820" y="105" font-size="12">· 个人信息查看</text>
+  <text x="820" y="125" font-size="12">· 上机状态显示</text>
+  <text x="820" y="145" font-size="12">· 消费记录查询</text>
+  <text x="820" y="165" font-size="12">· 充值记录查询</text>
+  <text x="820" y="185" font-size="12">· 修改密码</text>
+  <text x="820" y="205" font-size="12">· 报修记录查看</text>
+
+  <!-- 连线：个人中心 → 个人中心展开 -->
+  <line x1="750" y1="140" x2="800" y2="140" stroke="#333" stroke-width="1.5"/>
+
+  <!-- 前台各模块 -->
+  <rect x="200" y="110" width="70" height="60" fill="#e8f0fe" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="235" y="147" text-anchor="middle" font-size="13">零食超市</text>
+
+  <rect x="310" y="110" width="70" height="60" fill="#e8f0fe" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="345" y="147" text-anchor="middle" font-size="13">个人中心</text>
+
+  <rect x="420" y="110" width="70" height="60" fill="#e8f0fe" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="455" y="147" text-anchor="middle" font-size="13">报修申请</text>
+
+  <rect x="530" y="110" width="70" height="60" fill="#e8f0fe" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="565" y="147" text-anchor="middle" font-size="13">在线状态</text>
+
+  <rect x="640" y="110" width="70" height="60" fill="#e8f0fe" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="675" y="147" text-anchor="middle" font-size="13">我的订单</text>
+
+  <rect x="750" y="110" width="70" height="60" fill="#e8f0fe" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="785" y="147" text-anchor="middle" font-size="13">修改密码</text>
+
+  <!-- 连线：各模块 → 横线 -->
+  <line x1="235" y1="170" x2="235" y2="195" stroke="#333" stroke-width="1.5"/>
+  <line x1="345" y1="170" x2="345" y2="195" stroke="#333" stroke-width="1.5"/>
+  <line x1="455" y1="170" x2="455" y2="195" stroke="#333" stroke-width="1.5"/>
+  <line x1="565" y1="170" x2="565" y2="195" stroke="#333" stroke-width="1.5"/>
+  <line x1="675" y1="170" x2="675" y2="195" stroke="#333" stroke-width="1.5"/>
+  <line x1="785" y1="170" x2="785" y2="195" stroke="#333" stroke-width="1.5"/>
+
+  <!-- 横线 -->
+  <line x1="235" y1="195" x2="785" y2="195" stroke="#333" stroke-width="1.5"/>
+
+  <!-- 前台框 -->
+  <rect x="430" y="195" width="320" height="45" fill="#fff" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="590" y="223" text-anchor="middle" font-size="15" font-weight="bold">前 台（用户端）</text>
+
+  <line x1="590" y1="195" x2="590" y2="195" stroke="#333" stroke-width="1.5"/>
+</g>
+
+<!-- ===== 系统核心 ===== -->
+<g id="system-core">
+  <line x1="590" y1="240" x2="590" y2="275" stroke="#333" stroke-width="1.5"/>
+  <rect x="380" y="275" width="420" height="50" fill="#fff9e6" stroke="#333" stroke-width="2" rx="5"/>
+  <text x="590" y="305" text-anchor="middle" font-size="17" font-weight="bold">网吧计费管理系统（Web服务器）</text>
+</g>
+
+<!-- ===== 后台管理员区域 ===== -->
+<g id="backend">
+  <line x1="590" y1="325" x2="590" y2="370" stroke="#333" stroke-width="1.5"/>
+  <rect x="460" y="370" width="260" height="45" fill="#fff" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="590" y="398" text-anchor="middle" font-size="15" font-weight="bold">后 台 管 理 员</text>
+
+  <!-- 竖线 -->
+  <line x1="590" y1="415" x2="590" y2="445" stroke="#333" stroke-width="1.5"/>
+
+  <!-- 横线 -->
+  <line x1="100" y1="445" x2="1080" y2="445" stroke="#333" stroke-width="1.5"/>
+
+  <!-- 后台各模块 -->
+  <rect x="100" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="132" y="487" text-anchor="middle" font-size="13">系统首页</text>
+
+  <rect x="185" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="217" y="487" text-anchor="middle" font-size="13">用户管理</text>
+
+  <rect x="270" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="302" y="487" text-anchor="middle" font-size="13">充值管理</text>
+
+  <rect x="355" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="387" y="487" text-anchor="middle" font-size="13">上网管理</text>
+
+  <rect x="440" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="472" y="487" text-anchor="middle" font-size="13">会员管理</text>
+
+  <rect x="525" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="557" y="487" text-anchor="middle" font-size="13">零食超市</text>
+
+  <rect x="610" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="642" y="487" text-anchor="middle" font-size="13">报修管理</text>
+
+  <rect x="695" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="727" y="487" text-anchor="middle" font-size="13">报表统计</text>
+
+  <rect x="780" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="812" y="487" text-anchor="middle" font-size="13">系统日志</text>
+
+  <rect x="865" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="897" y="487" text-anchor="middle" font-size="13">上网单价</text>
+
+  <rect x="950" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="982" y="487" text-anchor="middle" font-size="13">文件上传</text>
+
+  <rect x="1035" y="445" width="65" height="70" fill="#fce4ec" stroke="#333" stroke-width="1.5" rx="4"/>
+  <text x="1067" y="487" text-anchor="middle" font-size="13">我的信息</text>
+
+  <!-- 各模块竖线到横线 -->
+  <line x1="132" y1="515" x2="132" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="217" y1="515" x2="217" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="302" y1="515" x2="302" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="387" y1="515" x2="387" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="472" y1="515" x2="472" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="557" y1="515" x2="557" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="642" y1="515" x2="642" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="727" y1="515" x2="727" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="812" y1="515" x2="812" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="897" y1="515" x2="897" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="982" y1="515" x2="982" y2="530" stroke="#333" stroke-width="1.5"/>
+  <line x1="1067" y1="515" x2="1067" y2="530" stroke="#333" stroke-width="1.5"/>
+
+</g>
+
+</svg>
+</body>
+</html>
