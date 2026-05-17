@@ -1,216 +1,313 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" font-family="Microsoft YaHei, SimHei, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 900" font-family="SimHei, Microsoft YaHei, sans-serif">
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#000"/>
     </marker>
   </defs>
   
-  <rect width="1200" height="800" fill="#ffffff"/>
-  
-  <!-- 标题 -->
-  <text x="600" y="40" text-anchor="middle" font-size="28" font-weight="bold" fill="#333">网吧计费管理系统 - 数据流图</text>
+  <rect width="1300" height="900" fill="#fff"/>
   
   <!-- 外部实体：管理员 -->
-  <rect x="50" y="100" width="140" height="50" rx="5" ry="5" fill="#e6f3ff" stroke="#2563eb" stroke-width="2"/>
-  <text x="120" y="130" text-anchor="middle" font-size="16" fill="#333">管理员</text>
+  <rect x="30" y="80" width="130" height="60" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="95" y="118" text-anchor="middle" font-size="16" fill="#000">管理员</text>
   
-  <!-- 外部实体：用户 -->
-  <rect x="50" y="250" width="140" height="50" rx="5" ry="5" fill="#e6f3ff" stroke="#2563eb" stroke-width="2"/>
-  <text x="120" y="280" text-anchor="middle" font-size="16" fill="#333">用户</text>
+  <!-- 外部实体：普通用户 -->
+  <rect x="30" y="220" width="130" height="70" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="95" y="250" text-anchor="middle" font-size="15" fill="#000">普通用户</text>
+  <text x="95" y="272" text-anchor="middle" font-size="12" fill="#000">（上网顾客）</text>
   
-  <!-- 处理过程 -->
-  <ellipse cx="400" cy="125" rx="75" ry="35" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="400" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">P1</text>
-  <text x="400" y="140" text-anchor="middle" font-size="11" fill="#333">登录管理</text>
+  <!-- 处理过程 P1 -->
+  <ellipse cx="420" cy="60" rx="85" ry="40" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="420" y="53" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">P1</text>
+  <text x="420" y="78" text-anchor="middle" font-size="15" fill="#000">登录验证</text>
   
-  <ellipse cx="400" cy="275" rx="75" ry="35" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="400" y="270" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">P2</text>
-  <text x="400" y="290" text-anchor="middle" font-size="11" fill="#333">用户管理</text>
+  <!-- 处理过程 P2 -->
+  <ellipse cx="420" cy="160" rx="85" ry="40" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="420" y="153" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">P2</text>
+  <text x="420" y="178" text-anchor="middle" font-size="15" fill="#000">用户管理</text>
   
-  <ellipse cx="600" cy="125" rx="75" ry="35" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="600" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">P3</text>
-  <text x="600" y="140" text-anchor="middle" font-size="11" fill="#333">上机计费</text>
+  <!-- 处理过程 P3 -->
+  <ellipse cx="420" cy="260" rx="85" ry="40" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="420" y="253" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">P3</text>
+  <text x="420" y="278" text-anchor="middle" font-size="15" fill="#000">上机计费</text>
   
-  <ellipse cx="600" cy="275" rx="75" ry="35" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="600" y="270" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">P4</text>
-  <text x="600" y="290" text-anchor="middle" font-size="11" fill="#333">充值管理</text>
+  <!-- 处理过程 P4 -->
+  <ellipse cx="420" cy="360" rx="85" ry="40" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="420" y="353" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">P4</text>
+  <text x="420" y="378" text-anchor="middle" font-size="15" fill="#000">充值管理</text>
   
-  <ellipse cx="400" cy="425" rx="75" ry="35" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="400" y="420" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">P5</text>
-  <text x="400" y="440" text-anchor="middle" font-size="11" fill="#333">会员管理</text>
+  <!-- 处理过程 P5 -->
+  <ellipse cx="420" cy="460" rx="85" ry="40" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="420" y="453" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">P5</text>
+  <text x="420" y="478" text-anchor="middle" font-size="15" fill="#000">会员管理</text>
   
-  <ellipse cx="600" cy="425" rx="75" ry="35" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="600" y="420" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">P6</text>
-  <text x="600" y="440" text-anchor="middle" font-size="11" fill="#333">报表统计</text>
+  <!-- 处理过程 P6 -->
+  <ellipse cx="420" cy="560" rx="85" ry="40" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="420" y="553" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">P6</text>
+  <text x="420" y="578" text-anchor="middle" font-size="15" fill="#000">零食超市</text>
   
-  <!-- 数据存储 -->
-  <g transform="translate(850, 80)">
-    <rect x="0" y="0" width="150" height="40" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="0" x2="160" y2="0" stroke="#16a34a" stroke-width="2"/>
-    <line x1="160" y1="0" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="40" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <text x="75" y="25" text-anchor="middle" font-size="13" fill="#333">管理员表</text>
+  <!-- 处理过程 P7 -->
+  <ellipse cx="420" cy="660" rx="85" ry="40" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="420" y="653" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">P7</text>
+  <text x="420" y="678" text-anchor="middle" font-size="15" fill="#000">报修管理</text>
+  
+  <!-- 处理过程 P8 -->
+  <ellipse cx="420" cy="760" rx="85" ry="40" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="420" y="753" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">P8</text>
+  <text x="420" y="778" text-anchor="middle" font-size="15" fill="#000">系统配置</text>
+  
+  <!-- 处理过程 P9 -->
+  <ellipse cx="420" cy="860" rx="85" ry="40" fill="#fff" stroke="#000" stroke-width="2"/>
+  <text x="420" y="853" text-anchor="middle" font-size="18" font-weight="bold" fill="#000">P9</text>
+  <text x="420" y="878" text-anchor="middle" font-size="15" fill="#000">报表统计</text>
+  
+  <!-- 数据存储 D1 -->
+  <g transform="translate(880, 30)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D1</text>
   </g>
+  <text x="1000" y="52" text-anchor="start" font-size="14" fill="#000">管理员表</text>
   
-  <g transform="translate(850, 140)">
-    <rect x="0" y="0" width="150" height="40" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="0" x2="160" y2="0" stroke="#16a34a" stroke-width="2"/>
-    <line x1="160" y1="0" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="40" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <text x="75" y="25" text-anchor="middle" font-size="13" fill="#333">用户表</text>
+  <!-- 数据存储 D2 -->
+  <g transform="translate(880, 80)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D2</text>
   </g>
+  <text x="1000" y="102" text-anchor="start" font-size="14" fill="#000">用户表</text>
   
-  <g transform="translate(850, 200)">
-    <rect x="0" y="0" width="150" height="40" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="0" x2="160" y2="0" stroke="#16a34a" stroke-width="2"/>
-    <line x1="160" y1="0" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="40" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <text x="75" y="25" text-anchor="middle" font-size="13" fill="#333">会员等级表</text>
+  <!-- 数据存储 D3 -->
+  <g transform="translate(880, 130)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D3</text>
   </g>
+  <text x="1000" y="152" text-anchor="start" font-size="14" fill="#000">会员等级表</text>
   
-  <g transform="translate(850, 260)">
-    <rect x="0" y="0" width="150" height="40" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="0" x2="160" y2="0" stroke="#16a34a" stroke-width="2"/>
-    <line x1="160" y1="0" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="40" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <text x="75" y="25" text-anchor="middle" font-size="13" fill="#333">上机记录表</text>
+  <!-- 数据存储 D4 -->
+  <g transform="translate(880, 180)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D4</text>
   </g>
+  <text x="1000" y="202" text-anchor="start" font-size="14" fill="#000">上机记录表</text>
   
-  <g transform="translate(850, 320)">
-    <rect x="0" y="0" width="150" height="40" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="0" x2="160" y2="0" stroke="#16a34a" stroke-width="2"/>
-    <line x1="160" y1="0" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="40" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <text x="75" y="25" text-anchor="middle" font-size="13" fill="#333">充值记录表</text>
+  <!-- 数据存储 D5 -->
+  <g transform="translate(880, 230)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D5</text>
   </g>
+  <text x="1000" y="252" text-anchor="start" font-size="14" fill="#000">充值记录表</text>
   
-  <g transform="translate(850, 380)">
-    <rect x="0" y="0" width="150" height="40" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="0" x2="160" y2="0" stroke="#16a34a" stroke-width="2"/>
-    <line x1="160" y1="0" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="40" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <text x="75" y="25" text-anchor="middle" font-size="13" fill="#333">消费记录表</text>
+  <!-- 数据存储 D6 -->
+  <g transform="translate(880, 280)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D6</text>
   </g>
+  <text x="1000" y="302" text-anchor="start" font-size="14" fill="#000">消费记录表</text>
   
-  <g transform="translate(850, 440)">
-    <rect x="0" y="0" width="150" height="40" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="0" x2="160" y2="0" stroke="#16a34a" stroke-width="2"/>
-    <line x1="160" y1="0" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <line x1="150" y1="40" x2="160" y2="40" stroke="#16a34a" stroke-width="2"/>
-    <text x="75" y="25" text-anchor="middle" font-size="13" fill="#333">系统日志表</text>
+  <!-- 数据存储 D7 -->
+  <g transform="translate(880, 330)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D7</text>
   </g>
+  <text x="1000" y="352" text-anchor="start" font-size="14" fill="#000">系统日志表</text>
+  
+  <!-- 数据存储 D8 -->
+  <g transform="translate(880, 380)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D8</text>
+  </g>
+  <text x="1000" y="402" text-anchor="start" font-size="14" fill="#000">报修表</text>
+  
+  <!-- 数据存储 D9 -->
+  <g transform="translate(880, 430)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D9</text>
+  </g>
+  <text x="1000" y="452" text-anchor="start" font-size="14" fill="#000">零食商品表</text>
+  
+  <!-- 数据存储 D10 -->
+  <g transform="translate(880, 480)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D10</text>
+  </g>
+  <text x="1000" y="502" text-anchor="start" font-size="14" fill="#000">零食订单表</text>
+  
+  <!-- 数据存储 D11 -->
+  <g transform="translate(880, 530)">
+    <rect x="0" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <rect x="10" y="0" width="80" height="35" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="50" y="23" text-anchor="middle" font-size="14" font-weight="bold" fill="#000">D11</text>
+  </g>
+  <text x="1000" y="552" text-anchor="start" font-size="14" fill="#000">系统配置表</text>
   
   <!-- 数据流连线 -->
-  <!-- 管理员 -> P1登录管理 -->
-  <path d="M 190 125 L 320 125" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="255" y="118" text-anchor="middle" font-size="10" fill="#333">登录请求</text>
+  <!-- 管理员 -> P1 -->
+  <path d="M 160 110 L 330 60" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="75" text-anchor="middle" font-size="13" fill="#000">登录信息</text>
   
-  <!-- 用户 -> P1登录管理 -->
-  <path d="M 190 275 L 320 155" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="255" y="200" text-anchor="middle" font-size="10" fill="#333">登录请求</text>
+  <!-- 普通用户 -> P1 -->
+  <path d="M 160 255 L 330 65" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="155" text-anchor="middle" font-size="13" fill="#000">登录信息</text>
   
-  <!-- P1 -> 管理员表 -->
-  <path d="M 475 125 L 850 100" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="660" y="105" text-anchor="middle" font-size="10" fill="#333">认证信息</text>
+  <!-- P1 -> D1 -->
+  <path d="M 505 60 L 880 47" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="50" text-anchor="middle" font-size="13" fill="#000">查询/验证</text>
   
-  <!-- P1 -> 系统日志表 -->
-  <path d="M 475 125 L 750 125 L 750 460 L 850 460" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
-  <text x="610" y="115" text-anchor="middle" font-size="10" fill="#333">日志记录</text>
+  <!-- P1 -> D7 -->
+  <path d="M 505 60 L 880 347" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="195" text-anchor="middle" font-size="13" fill="#000">登录日志</text>
   
-  <!-- 管理员 -> P2用户管理 -->
-  <path d="M 190 125 L 320 275" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="255" y="195" text-anchor="middle" font-size="10" fill="#333">用户操作</text>
+  <!-- 管理员 -> P2 -->
+  <path d="M 160 110 L 330 160" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="130" text-anchor="middle" font-size="13" fill="#000">用户操作</text>
   
-  <!-- P2 -> 用户表 -->
-  <path d="M 475 275 L 850 160" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="660" y="210" text-anchor="middle" font-size="10" fill="#333">用户数据</text>
+  <!-- P2 -> D2 -->
+  <path d="M 505 160 L 880 97" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="120" text-anchor="middle" font-size="13" fill="#000">用户信息</text>
   
-  <!-- P2 -> 会员等级表 -->
-  <path d="M 475 275 L 850 220" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="660" y="240" text-anchor="middle" font-size="10" fill="#333">会员等级</text>
+  <!-- P2 -> D7 -->
+  <path d="M 505 160 L 880 347" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="245" text-anchor="middle" font-size="13" fill="#000">操作日志</text>
   
-  <!-- P2 -> 系统日志表 -->
-  <path d="M 475 275 L 700 275 L 700 460 L 850 460" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
+  <!-- 管理员 -> P3 -->
+  <path d="M 160 110 L 330 260" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="180" text-anchor="middle" font-size="13" fill="#000">上机/下机指令</text>
   
-  <!-- 管理员 -> P3上机计费 -->
-  <path d="M 190 125 L 520 125" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="355" y="115" text-anchor="middle" font-size="10" fill="#333">上机指令</text>
+  <!-- 普通用户 -> P3 -->
+  <path d="M 160 255 L 330 260" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="252" text-anchor="middle" font-size="13" fill="#000">上机/下机指令</text>
   
-  <!-- 用户 -> P3上机计费 -->
-  <path d="M 190 275 L 520 145" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="355" y="200" text-anchor="middle" font-size="10" fill="#333">上机操作</text>
+  <!-- P3 -> D4 -->
+  <path d="M 505 260 L 880 197" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="222" text-anchor="middle" font-size="13" fill="#000">上机记录</text>
   
-  <!-- P3 -> 上机记录表 -->
-  <path d="M 675 125 L 850 280" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="760" y="195" text-anchor="middle" font-size="10" fill="#333">上机记录</text>
+  <!-- P3 -> D2 -->
+  <path d="M 505 260 L 880 97" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="172" text-anchor="middle" font-size="13" fill="#000">余额信息</text>
   
-  <!-- P3 -> 消费记录表 -->
-  <path d="M 675 125 L 850 400" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="760" y="255" text-anchor="middle" font-size="10" fill="#333">消费记录</text>
+  <!-- P3 -> D6 -->
+  <path d="M 505 260 L 880 297" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="272" text-anchor="middle" font-size="13" fill="#000">消费记录</text>
   
-  <!-- 管理员 -> P4充值管理 -->
-  <path d="M 190 125 L 520 275" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="355" y="190" text-anchor="middle" font-size="10" fill="#333">充值操作</text>
+  <!-- P3 -> D11 -->
+  <path d="M 505 260 L 880 547" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="397" text-anchor="middle" font-size="13" fill="#000">读取费率</text>
   
-  <!-- P4 -> 充值记录表 -->
-  <path d="M 675 275 L 850 340" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="760" y="300" text-anchor="middle" font-size="10" fill="#333">充值记录</text>
+  <!-- 管理员 -> P4 -->
+  <path d="M 160 110 L 330 360" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="230" text-anchor="middle" font-size="13" fill="#000">充值操作</text>
   
-  <!-- P4 -> 用户表 -->
-  <path d="M 675 275 L 750 275 L 750 160 L 850 160" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="710" y="265" text-anchor="middle" font-size="10" fill="#333">更新余额</text>
+  <!-- P4 -> D5 -->
+  <path d="M 505 360 L 880 247" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="297" text-anchor="middle" font-size="13" fill="#000">充值记录</text>
   
-  <!-- 管理员 -> P5会员管理 -->
-  <path d="M 190 125 L 320 425" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="255" y="270" text-anchor="middle" font-size="10" fill="#333">会员操作</text>
+  <!-- P4 -> D2 -->
+  <path d="M 505 360 L 880 97" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="222" text-anchor="middle" font-size="13" fill="#000">更新余额</text>
   
-  <!-- P5 -> 会员等级表 -->
-  <path d="M 475 425 L 850 220" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="660" y="315" text-anchor="middle" font-size="10" fill="#333">等级设置</text>
+  <!-- 普通用户 -> P5 -->
+  <path d="M 160 255 L 330 460" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="350" text-anchor="middle" font-size="13" fill="#000">会员操作</text>
   
-  <!-- P5 -> 用户表 -->
-  <path d="M 475 425 L 850 160" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="660" y="285" text-anchor="middle" font-size="10" fill="#333">会员信息</text>
+  <!-- P5 -> D3 -->
+  <path d="M 505 460 L 880 147" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="297" text-anchor="middle" font-size="13" fill="#000">等级信息</text>
   
-  <!-- 管理员 -> P6报表统计 -->
-  <path d="M 190 125 L 520 425" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
-  <text x="355" y="265" text-anchor="middle" font-size="10" fill="#333">查询请求</text>
+  <!-- P5 -> D2 -->
+  <path d="M 505 460 L 880 97" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="272" text-anchor="middle" font-size="13" fill="#000">会员等级</text>
   
-  <!-- P6 -> 用户表 -->
-  <path d="M 675 425 L 850 160" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
-  <text x="760" y="285" text-anchor="middle" font-size="10" fill="#333">查询数据</text>
+  <!-- 管理员 -> P6 -->
+  <path d="M 160 110 L 330 560" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="330" text-anchor="middle" font-size="13" fill="#000">商品管理</text>
   
-  <!-- P6 -> 上机记录表 -->
-  <path d="M 675 425 L 850 280" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
+  <!-- 普通用户 -> P6 -->
+  <path d="M 160 255 L 330 560" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="400" text-anchor="middle" font-size="13" fill="#000">购买订单</text>
   
-  <!-- P6 -> 充值记录表 -->
-  <path d="M 675 425 L 850 340" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
+  <!-- P6 -> D9 -->
+  <path d="M 505 560 L 880 447" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="497" text-anchor="middle" font-size="13" fill="#000">商品信息</text>
   
-  <!-- P6 -> 消费记录表 -->
-  <path d="M 675 425 L 850 400" stroke="#333" stroke-width="1.5" fill="none" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
+  <!-- P6 -> D10 -->
+  <path d="M 505 560 L 880 497" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="522" text-anchor="middle" font-size="13" fill="#000">订单信息</text>
+  
+  <!-- P6 -> D2 -->
+  <path d="M 505 560 L 880 97" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="322" text-anchor="middle" font-size="13" fill="#000">扣费信息</text>
+  
+  <!-- P6 -> D6 -->
+  <path d="M 505 560 L 880 297" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="422" text-anchor="middle" font-size="13" fill="#000">消费记录</text>
+  
+  <!-- 普通用户 -> P7 -->
+  <path d="M 160 255 L 330 660" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="450" text-anchor="middle" font-size="13" fill="#000">报修信息</text>
+  
+  <!-- 管理员 -> P7 -->
+  <path d="M 160 110 L 330 660" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="380" text-anchor="middle" font-size="13" fill="#000">处理结果</text>
+  
+  <!-- P7 -> D8 -->
+  <path d="M 505 660 L 880 397" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="522" text-anchor="middle" font-size="13" fill="#000">报修记录</text>
+  
+  <!-- 管理员 -> P8 -->
+  <path d="M 160 110 L 330 760" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="430" text-anchor="middle" font-size="13" fill="#000">配置信息</text>
+  
+  <!-- P8 -> D11 -->
+  <path d="M 505 760 L 880 547" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="647" text-anchor="middle" font-size="13" fill="#000">配置参数</text>
+  
+  <!-- 管理员 -> P9 -->
+  <path d="M 160 110 L 330 860" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="245" y="480" text-anchor="middle" font-size="13" fill="#000">查询请求</text>
+  
+  <!-- P9 -> D2 -->
+  <path d="M 505 860 L 880 97" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="472" text-anchor="middle" font-size="13" fill="#000">读取用户数据</text>
+  
+  <!-- P9 -> D4 -->
+  <path d="M 505 860 L 880 197" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="522" text-anchor="middle" font-size="13" fill="#000">读取上机数据</text>
+  
+  <!-- P9 -> D5 -->
+  <path d="M 505 860 L 880 247" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="547" text-anchor="middle" font-size="13" fill="#000">读取充值数据</text>
+  
+  <!-- P9 -> D6 -->
+  <path d="M 505 860 L 880 297" stroke="#000" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <text x="690" y="572" text-anchor="middle" font-size="13" fill="#000">读取消費数据</text>
   
   <!-- 图例 -->
-  <g transform="translate(80, 530)">
-    <text x="0" y="0" font-size="16" font-weight="bold" fill="#333">图例说明</text>
+  <g transform="translate(30, 750)">
+    <rect x="0" y="0" width="160" height="140" fill="#fff" stroke="#000" stroke-width="2"/>
+    <text x="80" y="25" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">图例说明</text>
     
-    <rect x="0" y="25" width="60" height="30" rx="5" ry="5" fill="#e6f3ff" stroke="#2563eb" stroke-width="2"/>
-    <text x="70" y="43" font-size="13" fill="#333">外部实体</text>
+    <rect x="10" y="35" width="40" height="22" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    <text x="60" y="51" text-anchor="start" font-size="13" fill="#000">外部实体</text>
     
-    <ellipse cx="180" cy="40" rx="35" ry="18" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-    <text x="220" y="43" font-size="13" fill="#333">处理过程</text>
+    <ellipse cx="30" cy="78" rx="22" ry="12" fill="#fff" stroke="#000" stroke-width="1.5"/>
+    <text x="60" y="83" text-anchor="start" font-size="13" fill="#000">处理过程</text>
     
-    <g transform="translate(320, 20)">
-      <rect x="0" y="0" width="60" height="30" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-      <line x1="60" y1="0" x2="70" y2="0" stroke="#16a34a" stroke-width="2"/>
-      <line x1="70" y1="0" x2="70" y2="30" stroke="#16a34a" stroke-width="2"/>
-      <line x1="60" y1="30" x2="70" y2="30" stroke="#16a34a" stroke-width="2"/>
+    <g transform="translate(10, 95)">
+      <rect x="0" y="0" width="40" height="22" fill="#fff" stroke="#000" stroke-width="1.5"/>
+      <rect x="5" y="0" width="40" height="22" fill="#fff" stroke="#000" stroke-width="1.5"/>
     </g>
-    <text x="400" y="43" font-size="13" fill="#333">数据存储</text>
+    <text x="60" y="111" text-anchor="start" font-size="13" fill="#000">数据存储</text>
     
-    <line x1="0" y1="75" x2="60" y2="75" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
-    <text x="70" y="80" font-size="13" fill="#333">数据流</text>
-    
-    <line x1="220" y1="75" x2="280" y2="75" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
-    <text x="290" y="80" font-size="13" fill="#333">查询数据流</text>
+    <line x1="10" y1="130" x2="55" y2="130" stroke="#000" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="60" y="135" text-anchor="start" font-size="13" fill="#000">数据流</text>
   </g>
 </svg>
